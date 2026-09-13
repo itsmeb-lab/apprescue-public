@@ -43,6 +43,14 @@ const FORBIDDEN_PUBLIC = [
   'tests/secret.test.cjs',
   'scripts/not-public.cjs'
 ];
+const HOMEPAGE_ASSET_ALLOWLIST = [
+  'favicon.ico',
+  'favicon.png',
+  'favicon.svg',
+  'favicon.jpg',
+  'og-image.svg',
+  'og-image.png'
+];
 
 function sha256(data) {
   return crypto.createHash('sha256').update(data).digest('hex');
@@ -62,6 +70,31 @@ function writeMinimalHomepage(root, extraHead) {
   const html = '<!DOCTYPE html><html><head><title>fixture</title>' + extraHead + '</head><body>fixture</body></html>\n';
   fs.writeFileSync(path.join(root, 'index.html'), html);
   return html;
+}
+
+function homepageReferencesAllowedAsset(html, name) {
+  return (
+    html.includes('/' + name) ||
+    html.includes('https://apprescue.ai/' + name) ||
+    html.includes('https://www.apprescue.ai/' + name) ||
+    html.includes('http://apprescue.ai/' + name) ||
+    html.includes('http://www.apprescue.ai/' + name)
+  );
+}
+
+function seedExistingReferencedAllowedHomepageAssets(root, homepageHtml) {
+  for (const name of HOMEPAGE_ASSET_ALLOWLIST) {
+    if (!homepageReferencesAllowedAsset(homepageHtml, name)) continue;
+    const src = path.join(REPO, name);
+    let st;
+    try {
+      st = fs.lstatSync(src);
+    } catch (err) {
+      continue;
+    }
+    if (st.isSymbolicLink() || !st.isFile()) continue;
+    fs.copyFileSync(src, path.join(root, name));
+  }
 }
 
 function writeFile(root, rel, contents) {
@@ -318,6 +351,7 @@ test('current homepage bytes are preserved when referenced PNG is present', () =
   const homepage = fs.readFileSync(path.join(REPO, 'index.html'));
   fs.writeFileSync(path.join(root, 'index.html'), homepage);
   writeFile(root, 'og-image.png', Buffer.from('SYNTHETIC-OG-PNG'));
+  seedExistingReferencedAllowedHomepageAssets(root, homepage.toString('utf8'));
   const out = path.join(os.tmpdir(), 'pub-out-home-' + process.pid);
   fs.rmSync(out, { recursive: true, force: true });
   const result = runBuild(root, out);

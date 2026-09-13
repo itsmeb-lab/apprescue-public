@@ -390,7 +390,7 @@ test('current required public routes exist as regular files without freezing lat
   const existing = gitMustRun([
     'diff',
     '--name-only',
-    PR4_PARENT,
+    PR4_PARENT + '..' + PR4_SHA,
     '--',
     'index.html',
     'netlify.toml',

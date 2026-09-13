@@ -33,3 +33,17 @@ CTA: **Request Private Beta Access**
 - Netlify Forms preserved: `name="beta-signup"`, hidden `form-name`, honeypot `bot-field`, fields `email` / `built_with` / `biggest_issue`, `data-netlify="true"`, `netlify-honeypot="bot-field"`, fetch POST with urlencoded FormData + success state + `form.submit()` fallback.
 - Claim-safe copy only; no fabricated customers, logos, testimonials, or metrics.
 - No AppAssessment / AppGuardian / Wilke links; no trackers; no heavy frameworks.
+
+## 2026-09-13 homepage launch finish (existing PR1)
+
+Actual candidate changes after the accepted-main base-sync:
+
+- `index.html` — six-section launch page: honest headline, free-tool entry, illustrative self-reported sample, $499 proposed scoped pilot, how-it-works, beta form + privacy/FAQ. System fonts. No fade-in hide. Nav CTA stays visible on small viewports. Form success only after `response.ok`; 4xx/5xx/timeout re-enable and keep values. Native POST remains for no-JS.
+- `tests/homepage-launch.test.cjs` — new dependency-free checks for copy, form contract, assets, and hosted-publication status.
+- `og-image.svg` — text aligned to the launch headline. SVG social-crawler compatibility UNVERIFIED. Raster preview DEFERRED.
+
+Unchanged by this implementation commit: `netlify.toml`, `favicon.svg`, `release-evidence/**`, `resources/**`, `scripts/**`, existing tests.
+
+Public host check on 2026-09-13: `https://apprescue.ai/release-evidence/` and `https://apprescue.ai/resources/` returned 404. Status: `PENDING_HOSTED_PUBLICATION`. Local mocks of the inquiry form prove UI behavior only, not Netlify receipt.
+
+Field LCP/INP/CLS: UNMEASURED.

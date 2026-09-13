@@ -3,1061 +3,516 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AppRescue.ai — Find out what you can actually trust</title>
-  <meta name="description" content="App Rescue helps you inspect AI-built v1 apps, surface risk, establish verification, and decide what to keep, repair, or rebuild — before you ship or change more." />
-  <link rel="canonical" href="https://apprescue.ai" />
+  <title>AppRescue — Know what to check before your next release</title>
+  <meta name="description" content="Free browser tools to organize release evidence and app costs, plus a proposed $499 scoped assessment pilot. No signup for the tools. Not a checkout, pentest, or certification." />
+  <meta name="referrer" content="no-referrer" />
+  <link rel="canonical" href="https://apprescue.ai/" />
 
-  <!-- Open Graph -->
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="AppRescue.ai" />
-  <meta property="og:title" content="You already built version 1. Now find out what you can actually trust." />
-  <meta property="og:description" content="App Rescue helps you inspect AI-built v1 apps, surface risk, establish verification, and decide what to keep, repair, or rebuild." />
-  <meta property="og:url" content="https://apprescue.ai" />
+  <meta property="og:site_name" content="AppRescue" />
+  <meta property="og:title" content="Know what to check before your next release." />
+  <meta property="og:description" content="Free tools to organize release evidence and app costs, with a scoped assessment pilot for teams that need a written next-step plan." />
+  <meta property="og:url" content="https://apprescue.ai/" />
   <meta property="og:image" content="https://apprescue.ai/og-image.svg" />
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="You already built version 1. Now find out what you can actually trust." />
-  <meta name="twitter:description" content="App Rescue helps you inspect AI-built v1 apps, surface risk, establish verification, and decide what to keep, repair, or rebuild." />
-  <meta name="twitter:image" content="https://apprescue.ai/og-image.svg" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Know what to check before your next release." />
+  <meta name="twitter:description" content="Free tools to organize release evidence and app costs, with a scoped assessment pilot for a written next-step plan." />
 
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="/favicon.svg" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; }
 
     :root {
+      color-scheme: dark;
       --bg: #0B1220;
       --bg-elevated: #0F172A;
       --card: #111A2E;
-      --card-hover: #152038;
-      --border: rgba(148, 163, 184, 0.12);
-      --border-hover: rgba(34, 211, 238, 0.28);
-      --text-primary: #F1F5F9;
-      --text-secondary: #94A3B8;
-      --text-muted: #64748B;
+      --border: #2A3A52;
+      --text: #F1F5F9;
+      --muted: #B6C3D6;
       --accent: #22D3EE;
-      --accent-soft: #67E8F9;
-      --accent-dim: rgba(34, 211, 238, 0.10);
-      --accent-glow: rgba(34, 211, 238, 0.18);
-      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --accent-text: #082028;
+      --accent-dim: rgba(34, 211, 238, 0.12);
+      --danger: #F8B4C0;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-padding-top: 6.5rem; }
 
     body {
+      margin: 0;
       background: var(--bg);
-      color: var(--text-primary);
+      color: var(--text);
       font-family: var(--font);
       font-size: 16px;
       line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
+      overflow-wrap: break-word;
     }
 
-    .container {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 0 24px;
+    a { color: var(--accent); }
+    a:hover { text-decoration-thickness: 2px; }
+
+    :focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
     }
 
-    section { padding: 96px 0; }
-
-    .fade-in {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
+    .skip {
+      position: absolute;
+      left: 8px;
+      top: -80px;
+      z-index: 200;
+      background: var(--text);
+      color: var(--bg);
+      padding: 12px 16px;
+      min-height: 44px;
+      font-weight: 700;
+      text-decoration: none;
     }
-    .fade-in.visible {
-      opacity: 1;
-      transform: translateY(0);
+    .skip:focus { top: 8px; }
+
+    .wrap {
+      width: min(1080px, calc(100% - 32px));
+      margin-inline: auto;
     }
 
-    /* Nav */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
+    header.site-header {
+      position: sticky;
+      top: 0;
       z-index: 100;
-      padding: 18px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(11, 18, 32, 0.85);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      background: var(--bg);
       border-bottom: 1px solid var(--border);
     }
 
-    .nav-logo {
-      font-size: 17px;
-      font-weight: 600;
-      letter-spacing: 0.01em;
-      color: var(--text-primary);
-      text-decoration: none;
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 0;
+      flex-wrap: wrap;
     }
-    .nav-logo span { color: var(--accent); }
+
+    .brand {
+      color: var(--text);
+      font-weight: 700;
+      font-size: 18px;
+      text-decoration: none;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .brand span { color: var(--accent); }
+
+    nav[aria-label="Primary"] {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px 8px;
+    }
+
+    nav[aria-label="Primary"] a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 10px 12px;
+      text-decoration: none;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 15px;
+    }
+    nav[aria-label="Primary"] a:hover { color: var(--text); }
 
     .nav-cta {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--bg);
       background: var(--accent);
-      text-decoration: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      transition: background 0.2s ease, box-shadow 0.2s ease;
-    }
-    .nav-cta:hover {
-      background: var(--accent-soft);
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-
-    .nav-badge {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 4px 12px;
-    }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    /* Hero */
-    #hero {
-      padding-top: 168px;
-      padding-bottom: 112px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    #hero::before {
-      content: '';
-      position: absolute;
-      top: -180px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 780px;
-      height: 560px;
-      background: radial-gradient(ellipse at center, rgba(34, 211, 238, 0.07) 0%, transparent 68%);
-      pointer-events: none;
-    }
-
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: var(--accent-dim);
-      border: 1px solid rgba(34, 211, 238, 0.22);
-      border-radius: 100px;
-      padding: 6px 16px;
-      margin-bottom: 32px;
-    }
-
-    .hero-eyebrow::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 8px var(--accent);
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.35; }
-    }
-
-    h1 {
-      font-size: clamp(34px, 5.6vw, 56px);
-      font-weight: 700;
-      line-height: 1.12;
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-      max-width: 860px;
-      margin: 0 auto 24px;
-    }
-
-    h1 em {
-      font-style: normal;
-      color: var(--accent-soft);
-    }
-
-    .hero-sub {
-      font-size: clamp(16px, 2.1vw, 19px);
-      color: var(--text-secondary);
-      max-width: 640px;
-      margin: 0 auto 18px;
-      line-height: 1.65;
-    }
-
-    .hero-power-line {
-      font-size: 14px;
-      color: rgba(34, 211, 238, 0.72);
-      max-width: 560px;
-      margin: 0 auto 44px;
-      line-height: 1.7;
-      letter-spacing: 0.02em;
-    }
-
-    .hero-cta-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--accent);
-      color: #0B1220;
-      font-family: var(--font);
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: 0.01em;
-      padding: 15px 28px;
+      color: var(--accent-text) !important;
       border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      transition: box-shadow 0.25s ease, transform 0.25s ease, background 0.25s ease;
-    }
-    .btn-primary:hover {
-      background: var(--accent-soft);
-      box-shadow: 0 0 28px var(--accent-glow), 0 8px 24px rgba(0, 0, 0, 0.35);
-      transform: translateY(-2px);
-    }
-    .btn-primary:hover svg { transform: translateX(3px); }
-    .btn-primary svg { transition: transform 0.2s ease; }
-
-    .hero-secondary {
-      font-size: 13px;
-      color: var(--text-muted);
-      max-width: 500px;
-      text-align: center;
-      line-height: 1.6;
+      padding: 10px 16px;
     }
 
-    /* Section chrome */
-    .section-header { margin-bottom: 56px; }
-    .section-header.centered { text-align: center; }
+    main { display: block; }
 
-    .section-label {
-      font-size: 11px;
-      font-weight: 600;
+    section { padding: 64px 0; border-top: 1px solid var(--border); }
+    #hero { border-top: 0; padding-top: 48px; padding-bottom: 56px; }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--accent);
-      margin-bottom: 14px;
-      display: block;
+      margin: 0 0 14px;
+    }
+
+    h1 {
+      font-size: clamp(32px, 6vw, 52px);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin: 0 0 18px;
+      max-width: 18ch;
     }
 
     h2 {
-      font-size: clamp(26px, 3.8vw, 38px);
-      font-weight: 700;
-      line-height: 1.18;
-      letter-spacing: -0.025em;
-      color: var(--text-primary);
-      margin-bottom: 16px;
+      font-size: clamp(24px, 3.6vw, 34px);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin: 0 0 14px;
     }
 
-    .section-desc {
-      font-size: 17px;
-      color: var(--text-secondary);
-      max-width: 600px;
-      line-height: 1.7;
-    }
-    .section-header.centered .section-desc { margin: 0 auto; }
+    h3 { font-size: 18px; margin: 0 0 8px; }
 
-    /* Problem */
-    #problem { border-top: 1px solid var(--border); }
+    p { margin: 0 0 14px; }
+    .lead { font-size: 19px; color: var(--muted); max-width: 42rem; }
+    .fine { font-size: 14px; color: var(--muted); }
 
-    .problem-body {
-      max-width: 700px;
-      margin-bottom: 40px;
-    }
-    .problem-body p {
-      font-size: 17px;
-      color: var(--text-secondary);
-      line-height: 1.75;
-      margin-bottom: 14px;
-    }
-
-    .problem-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
-    }
-
-    .problem-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
-    }
-    .problem-card:hover {
-      border-color: var(--border-hover);
-      background: var(--card-hover);
-      transform: translateY(-2px);
-    }
-
-    .problem-card-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: var(--accent-dim);
-      border: 1px solid rgba(34, 211, 238, 0.15);
+    .actions {
       display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 24px 0 12px;
+    }
+
+    .btn,
+    .btn-submit {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 14px;
-      color: var(--accent);
-    }
-
-    .problem-card h3 {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-      letter-spacing: -0.01em;
-    }
-    .problem-card p {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.55;
-    }
-
-    /* Workflow / What it does */
-    #workflow {
-      border-top: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
-    }
-    #workflow::before {
-      content: '';
-      position: absolute;
-      bottom: -120px;
-      right: -180px;
-      width: 520px;
-      height: 520px;
-      background: radial-gradient(ellipse at center, rgba(34, 211, 238, 0.04) 0%, transparent 65%);
-      pointer-events: none;
-    }
-
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 16px;
-    }
-
-    .feature-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 28px;
-      transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
-    }
-    .feature-card:hover {
-      border-color: var(--border-hover);
-      background: var(--card-hover);
-      transform: translateY(-3px);
-    }
-
-    .feature-number {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      color: var(--accent);
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .feature-card h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-      letter-spacing: -0.01em;
-    }
-    .feature-card p {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.65;
-    }
-
-    .workflow-note {
-      margin-top: 28px;
-      font-size: 14px;
-      color: var(--text-muted);
-      text-align: center;
-      max-width: 640px;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1.6;
-    }
-
-    /* Deliverables */
-    #deliverables { border-top: 1px solid var(--border); }
-
-    .deliverable-list {
-      list-style: none;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .deliverable-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      font-size: 15px;
-      color: var(--text-secondary);
-      background: var(--card);
-      border: 1px solid var(--border);
+      min-height: 44px;
+      padding: 12px 18px;
       border-radius: 10px;
-      padding: 16px 18px;
-      line-height: 1.5;
-      transition: border-color 0.2s ease, color 0.2s ease;
-    }
-    .deliverable-list li:hover {
-      border-color: rgba(34, 211, 238, 0.18);
-      color: var(--text-primary);
-    }
-    .deliverable-list li strong {
-      color: var(--text-primary);
-      font-weight: 600;
-      display: block;
-      margin-bottom: 2px;
+      border: 1px solid transparent;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
     }
 
-    .check-icon {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--accent-dim);
-      border: 1px solid rgba(34, 211, 238, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      color: var(--accent);
-      margin-top: 2px;
-    }
-    .check-icon svg { width: 11px; height: 11px; }
-
-    /* Why not another AI */
-    #why-not-ai { border-top: 1px solid var(--border); }
-
-    .compare-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+    .btn-primary,
+    .btn-submit {
+      background: var(--accent);
+      color: var(--accent-text);
     }
 
-    .compare-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 28px;
-    }
-    .compare-card.accented {
-      border-color: rgba(34, 211, 238, 0.25);
-      background: linear-gradient(160deg, rgba(34, 211, 238, 0.06), var(--card) 45%);
-    }
-    .compare-card h3 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--text-primary);
-    }
-    .compare-card ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .compare-card li {
-      font-size: 14px;
-      color: var(--text-secondary);
-      padding-left: 18px;
-      position: relative;
-      line-height: 1.55;
-    }
-    .compare-card li::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 8px;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--text-muted);
-    }
-    .compare-card.accented li::before { background: var(--accent); }
-
-    /* Decision framing */
-    #decision { border-top: 1px solid var(--border); }
-
-    .decision-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-
-    .decision-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 28px 24px;
-      text-align: left;
-    }
-    .decision-card .tag {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: var(--accent-dim);
-      border-radius: 100px;
-      padding: 4px 10px;
-      margin-bottom: 14px;
-    }
-    .decision-card h3 {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: var(--text-primary);
-    }
-    .decision-card p {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-
-    /* Audience */
-    #audience { border-top: 1px solid var(--border); }
-
-    .audience-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-    }
-
-    .audience-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 22px;
-    }
-    .audience-item h3 {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-    }
-    .audience-item p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.55;
-    }
-
-    /* Beta */
-    #beta {
-      border-top: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
-    }
-    #beta::before {
-      content: '';
-      position: absolute;
-      top: -140px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 680px;
-      height: 460px;
-      background: radial-gradient(ellipse at center, rgba(34, 211, 238, 0.05) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .beta-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 64px;
-      align-items: start;
-    }
-
-    .beta-form-wrap {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 36px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .form-field { margin-bottom: 18px; }
-    .form-field label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-    }
-    .form-field label .required-mark {
-      color: var(--accent);
-      margin-left: 2px;
-    }
-
-    .form-field input,
-    .form-field textarea {
-      width: 100%;
-      background: #0B1220;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-family: var(--font);
-      font-size: 14px;
-      padding: 12px 14px;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-      appearance: none;
-      -webkit-appearance: none;
-    }
-    .form-field input::placeholder,
-    .form-field textarea::placeholder { color: var(--text-muted); }
-    .form-field input:focus,
-    .form-field textarea:focus {
-      border-color: rgba(34, 211, 238, 0.4);
-      box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.08);
-    }
-    .form-field input.error,
-    .form-field textarea.error { border-color: rgba(251, 113, 133, 0.5); }
-
-    .field-error {
-      font-size: 12px;
-      color: #FB7185;
-      margin-top: 6px;
-      display: none;
-    }
-    .field-error.visible { display: block; }
-
-    .form-field textarea {
-      resize: vertical;
-      min-height: 88px;
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
     }
 
     .btn-submit {
       width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      background: var(--accent);
-      color: #0B1220;
-      font-family: var(--font);
+      margin-top: 8px;
+    }
+    .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .notice {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      color: var(--muted);
+      max-width: 46rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card,
+    .sample,
+    .pilot-panel,
+    .form-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+    }
+
+    .card p:last-child,
+    .sample p:last-child { margin-bottom: 0; }
+
+    .sample {
+      max-width: 40rem;
       font-size: 15px;
-      font-weight: 600;
-      padding: 14px 24px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      margin-top: 6px;
-      transition: box-shadow 0.25s ease, transform 0.25s ease, background 0.25s ease;
     }
-    .btn-submit:hover:not(:disabled) {
-      background: var(--accent-soft);
-      box-shadow: 0 0 24px var(--accent-glow);
-      transform: translateY(-2px);
-    }
-    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .btn-submit .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(11, 18, 32, 0.3);
-      border-top-color: #0B1220;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: none;
-    }
-    .btn-submit.loading .spinner { display: block; }
-    .btn-submit.loading .btn-text { display: none; }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .form-success {
-      display: none;
-      text-align: center;
-      padding: 36px 16px;
-    }
-    .form-success.visible { display: block; }
-
-    .success-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: var(--accent-dim);
-      border: 1px solid rgba(34, 211, 238, 0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
+    .sample dl { margin: 0; }
+    .sample dt {
       color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 16px 0 6px;
     }
-    .success-icon svg { width: 22px; height: 22px; }
+    .sample dt:first-child { margin-top: 0; }
+    .sample dd { margin: 0; color: var(--muted); }
+    .sample ul { margin: 0; padding-left: 1.2rem; color: var(--muted); }
 
-    .form-success h3 {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: var(--text-primary);
+    .price {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin: 8px 0 10px;
     }
-    .form-success p {
+    .price span {
+      display: block;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+
+    .steps { margin: 0; padding-left: 1.3rem; max-width: 40rem; }
+    .steps li { margin-bottom: 10px; color: var(--muted); }
+
+    .roadmap {
+      margin-top: 20px;
+      color: var(--muted);
+    }
+
+    .beta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .form-field { margin-bottom: 16px; }
+    .form-field label {
+      display: block;
+      font-weight: 650;
+      margin-bottom: 6px;
+    }
+    .optional { font-weight: 500; color: var(--muted); }
+
+    input,
+    textarea {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid #55647A;
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+    }
+    textarea { min-height: 96px; resize: vertical; }
+    input.error,
+    textarea.error { border-color: var(--danger); }
+
+    .field-error {
+      color: var(--danger);
       font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.65;
+      margin: 6px 0 0;
     }
 
-    /* Final CTA */
-    #final-cta {
-      border-top: 1px solid var(--border);
-      text-align: center;
-      padding: 72px 0;
+    .form-status {
+      min-height: 24px;
+      margin: 12px 0 0;
+      color: var(--muted);
     }
-    .final-cta-text {
-      font-size: clamp(20px, 3.2vw, 32px);
-      font-weight: 600;
-      color: var(--text-secondary);
-      letter-spacing: -0.02em;
-      margin-bottom: 28px;
-      line-height: 1.3;
-    }
-    .final-cta-text strong { color: var(--text-primary); }
-    .final-tagline {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-top: 24px;
-      letter-spacing: 0.02em;
-    }
+    .form-status[data-state="ok"] { color: var(--accent); }
+    .form-status[data-state="err"] { color: var(--danger); }
 
-    /* Footer */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 36px 24px;
+    .form-success h3 { margin-top: 0; }
+
+    .faq details {
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+    }
+    .faq summary {
+      cursor: pointer;
+      font-weight: 700;
+      min-height: 44px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 14px;
     }
-    .footer-logo {
+    .faq details p { margin: 8px 0 4px; color: var(--muted); }
+
+    footer.site-footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0 40px;
+      color: var(--muted);
       font-size: 14px;
-      font-weight: 600;
-      color: var(--text-primary);
     }
-    .footer-logo span { color: var(--accent); }
-    .footer-note { font-size: 13px; color: var(--text-muted); }
+    footer.site-footer p { margin: 0 0 8px; }
 
-    /* Responsive */
-    @media (max-width: 900px) {
-      .deliverable-list,
-      .compare-grid,
-      .decision-grid,
-      .beta-layout {
-        grid-template-columns: 1fr;
-      }
-      .beta-layout { gap: 40px; }
+    @media (max-width: 800px) {
+      html { scroll-padding-top: 12.5rem; }
+      .cards,
+      .beta-grid { grid-template-columns: 1fr; }
+      h1 { max-width: none; }
     }
 
-    @media (max-width: 640px) {
-      section { padding: 68px 0; }
-      nav { padding: 14px 16px; }
-      .nav-cta { display: none; }
-      #hero {
-        padding-top: 132px;
-        padding-bottom: 72px;
-      }
-      .container { padding: 0 18px; }
-      .beta-form-wrap { padding: 24px 18px; }
-      footer {
-        flex-direction: column;
-        text-align: center;
-      }
-      .problem-cards,
-      .feature-grid,
-      .audience-grid {
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 375px) {
+      .wrap { width: min(1080px, calc(100% - 24px)); }
+      section { padding: 48px 0; }
+      #hero { padding-top: 32px; }
     }
 
-    @media (max-width: 390px) {
-      h1 { font-size: 30px; }
-      .btn-primary { width: 100%; justify-content: center; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
     }
   </style>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
 
-  <nav>
-    <a href="#hero" class="nav-logo">App <span>Rescue</span></a>
-    <div class="nav-right">
-      <span class="nav-badge">Private Beta</span>
-      <a href="#beta" class="nav-cta">Request Access</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#hero">App<span>Rescue</span></a>
+      <nav aria-label="Primary">
+        <a href="#tools">Tools</a>
+        <a href="#sample">Sample</a>
+        <a href="#pilot">Pilot</a>
+        <a href="#how">How it works</a>
+        <a href="#beta">Inquiry</a>
+        <a class="nav-cta" href="/release-evidence/">Release Evidence Check</a>
+      </nav>
     </div>
-  </nav>
+  </header>
 
-  <!-- 1. Hero -->
-  <section id="hero">
-    <div class="container">
-      <div class="fade-in">
-        <div class="hero-eyebrow">Private Beta</div>
-        <h1>You already built version 1.<br /><em>Now find out what you can actually trust.</em></h1>
-        <p class="hero-sub">App Rescue helps you inspect AI-built apps, surface risk, establish verification, and choose a safer path forward — keep, repair, or rebuild — without more blind prompting.</p>
-        <p class="hero-power-line">Import your v1. Understand what’s inside. Prove what still works before you change it.</p>
-        <div class="hero-cta-group">
-          <a href="#beta" class="btn-primary">
-            Request Private Beta Access
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </a>
-          <p class="hero-secondary">For founders and builders with apps from AI app builders, coding agents, no-code tools, agencies, or custom MVP workflows.</p>
+  <main id="main">
+    <section id="hero" aria-labelledby="hero-title">
+      <div class="wrap">
+        <p class="eyebrow">Useful today · honest about tomorrow</p>
+        <h1 id="hero-title">Know what to check before your next release.</h1>
+        <p class="lead">Free tools to organize your release evidence and app costs, with a scoped assessment pilot for teams that need a written next-step plan.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="/release-evidence/">Open the Release Evidence Check</a>
+          <a class="btn btn-secondary" href="#beta">Request beta consideration</a>
         </div>
+        <p class="fine">Free tools need no signup. They run in your browser and do not scan your code. The pilot is a written inquiry, not checkout.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- 2. The new problem -->
-  <section id="problem">
-    <div class="container">
-      <div class="fade-in section-header">
-        <span class="section-label">The Problem</span>
-        <h2>AI made v1 easy.<br />Trust and change are still hard.</h2>
+    <section id="tools" aria-labelledby="tools-title">
+      <div class="wrap">
+        <p class="eyebrow">Free tools · browser only</p>
+        <h2 id="tools-title">Start with a self-check you can keep.</h2>
+        <p class="lead">These pages organize your own notes and numbers. They do not connect to your repository, execute tests, or create an account.</p>
+        <div class="cards">
+          <article class="card">
+            <h3><a href="/release-evidence/">Release Evidence Check</a></h3>
+            <p>Turn scattered test notes into a handoff packet. “Tested” remains your report. Detecting a tests folder is not the same as tests passing.</p>
+          </article>
+          <article class="card">
+            <h3><a href="/resources/app-cost-calculator/">App running-cost calculator</a></h3>
+            <p>A planner for builder, hosting, database, email, and usage lines you enter. Blank fields stay unknown. The result is a budget, not a quote.</p>
+          </article>
+          <article class="card">
+            <h3><a href="/resources/">Guides and portability checklist</a></h3>
+            <p>Short sourced notes on running cost versus builder cost, and what to collect before switching tools. Ordinary unpaid documentation links only.</p>
+          </article>
+          <article class="card">
+            <h3>No signup on the tools</h3>
+            <p>Answers stay in the tab unless you export them. Closing the page clears unsaved notes. These tools are not an automated AppRescue assessment.</p>
+          </article>
+        </div>
+        <p class="notice"><strong>Publication note.</strong> These destinations are composed in this site bundle. Whether the public host already serves them is a separate publish step and is recorded as pending until verified.</p>
       </div>
-      <div class="fade-in problem-body">
-        <p>Generating a working prototype is no longer the bottleneck. Knowing whether that prototype is safe to ship, maintain, or extend is.</p>
-        <p>Without structure and evidence, teams burn tokens and hours re-prompting the same fragile surface — hoping the next change won’t break auth, data, or the flows that already worked.</p>
+    </section>
+
+    <section id="sample" aria-labelledby="sample-title">
+      <div class="wrap">
+        <p class="eyebrow">Illustrative / self-reported</p>
+        <h2 id="sample-title">A sample observation, not a score.</h2>
+        <p class="lead">This card is invented for readability. It is not a customer result, a risk rating, or proof that checks ran.</p>
+        <article class="sample">
+          <p class="fine">Illustrative only · self-reported structure · not a customer result</p>
+          <dl>
+            <dt>Observed structure</dt>
+            <dd>A <code>tests/</code> folder is present in the supplied tree listing.</dd>
+            <dt>Unknown / not run</dt>
+            <dd>
+              <ul>
+                <li>Whether any test in that folder passed</li>
+                <li>Whether production checkout matches the listing</li>
+              </ul>
+            </dd>
+            <dt>Next check</dt>
+            <dd>In an authorized environment, run the named checkout test for this release and record expected versus actual outcome.</dd>
+          </dl>
+        </article>
       </div>
-      <div class="problem-cards">
-        <div class="fade-in problem-card">
-          <div class="problem-card-icon" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M9 2L2 6v6l7 4 7-4V6L9 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-              <path d="M9 6v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              <circle cx="9" cy="12" r="0.75" fill="currentColor"/>
-            </svg>
+    </section>
+
+    <section id="pilot" aria-labelledby="pilot-title">
+      <div class="wrap">
+        <p class="eyebrow">Proposed operator-assisted pilot</p>
+        <h2 id="pilot-title">A scoped written assessment, if capacity allows.</h2>
+        <div class="cards">
+          <div>
+            <p class="lead">The honest pilot is a scoped structural diagnostic and evidence summary, plus next checks. It is not a penetration test, security certification, correctness guarantee, or executed proof unless separately agreed checks actually ran.</p>
+            <p class="price">$499 <span>proposed one-time pilot price / accepted scope</span></p>
+            <p class="fine">Price, supported scope, safe access method, capacity, and delivery date must be agreed in writing before invoicing. This page does not take orders, collect payment, or guarantee a turnaround.</p>
           </div>
-          <h3>Hard to trust what’s generated</h3>
-          <p>Structure, assumptions, and edge cases are opaque until something fails in production.</p>
-        </div>
-        <div class="fade-in problem-card" style="transition-delay: 0.08s;">
-          <div class="problem-card-icon" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M3 9h12M9 3v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M5 5l8 8M13 5l-8 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/>
-            </svg>
+          <div class="pilot-panel">
+            <h3>What an accepted-scope review can include</h3>
+            <ul>
+              <li>A version-bound evidence inventory</li>
+              <li>Structural observations and unanswered questions</li>
+              <li>Practical next checks for one agreed workflow</li>
+              <li>An asynchronous written handoff</li>
+            </ul>
+            <p class="fine">A form inquiry is a request for consideration, not an accepted order.</p>
           </div>
-          <h3>Every change feels risky</h3>
-          <p>New features collide with old behavior. Regressions show up late — or never get caught.</p>
         </div>
-        <div class="fade-in problem-card" style="transition-delay: 0.16s;">
-          <div class="problem-card-icon" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M9 6v3.5l2 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+        <p class="roadmap"><strong>Roadmap, not a product card:</strong> future AppGuardian monitoring or repair work may come later. It is not priced or offered as an available service here.</p>
+      </div>
+    </section>
+
+    <section id="how" aria-labelledby="how-title">
+      <div class="wrap">
+        <p class="eyebrow">How it works</p>
+        <h2 id="how-title">Three separate paths. Do not mix them up.</h2>
+        <ol class="steps">
+          <li><strong>Free browser self-check.</strong> Use the Release Evidence Check or cost tools. No signup. No code upload. No scan.</li>
+          <li><strong>Optional written inquiry.</strong> If you want an operator-assisted plan, use the beta form. Do not send source, credentials, or customer data.</li>
+          <li><strong>Scoped assessment only after writing.</strong> Work starts only if scope, access, capacity, price, and date are agreed in writing.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="beta" aria-labelledby="beta-title">
+      <div class="wrap">
+        <div class="beta-grid">
+          <div>
+            <p class="eyebrow">Beta inquiry · not checkout</p>
+            <h2 id="beta-title">Ask about the scoped pilot.</h2>
+            <p class="lead">Email is required so a reply has somewhere to go. Other fields are optional. Submitting this form is not a purchase and does not reserve a delivery date.</p>
+            <p class="notice"><strong>Do not send code, credentials, private keys, customer data, or production access details.</strong> Describe the app in plain language. Browser-only tools above do not submit this form.</p>
+            <p class="fine">Inquiry fields go to AppRescue through Netlify Forms. If someone replies, they will use the email you submit. This page does not state a retention or deletion schedule, and it does not publish a support mailbox.</p>
+            <div class="faq" id="faq">
+              <h3>FAQ</h3>
+              <details>
+                <summary>Does a free tool scan my app?</summary>
+                <p>No. The Release Evidence Check and calculator run in your browser. They do not import source or run your test suite.</p>
+              </details>
+              <details>
+                <summary>Is the $499 pilot a live checkout?</summary>
+                <p>No. It is a proposed one-time price for a written, scoped review. Nothing on this page charges a card.</p>
+              </details>
+              <details>
+                <summary>Is this a security certification?</summary>
+                <p>No. It is not a penetration test, production certification, or a guarantee that the app is safe to ship.</p>
+              </details>
+              <details>
+                <summary>What if JavaScript is off?</summary>
+                <p>The form still posts with the browser’s normal submit. Tool pages that need scripts say so on those pages.</p>
+              </details>
+            </div>
           </div>
-          <h3>Tokens and hours get wasted</h3>
-          <p>Blind re-prompting burns budget without a proof baseline or a clear keep / repair / rebuild call.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. What AppRescue does -->
-  <section id="workflow">
-    <div class="container">
-      <div class="fade-in section-header centered">
-        <span class="section-label">What App Rescue Does</span>
-        <h2>A clearer workflow from v1 to a safer next step.</h2>
-        <p class="section-desc">Designed to inspect what you already have, expose risk, and create verification — so evolution is guided, not guessed.</p>
-      </div>
-      <div class="feature-grid">
-        <div class="fade-in feature-card">
-          <div class="feature-number">01</div>
-          <h3>Import &amp; map</h3>
-          <p>Bring in your existing project and map structure, flows, data models, and critical behavior from what actually exists.</p>
-        </div>
-        <div class="fade-in feature-card" style="transition-delay: 0.06s;">
-          <div class="feature-number">02</div>
-          <h3>Surface risk</h3>
-          <p>Highlight fragile logic, missing validation, unsafe assumptions, and weak points before they reach real users.</p>
-        </div>
-        <div class="fade-in feature-card" style="transition-delay: 0.12s;">
-          <div class="feature-number">03</div>
-          <h3>Establish verification</h3>
-          <p>Clarify what can be proven, what cannot, and what should be hardened before you ship or change more.</p>
-        </div>
-        <div class="fade-in feature-card" style="transition-delay: 0.18s;">
-          <div class="feature-number">04</div>
-          <h3>Guide the next move</h3>
-          <p>Frame keep / repair / rebuild decisions and plan safer changes so version 2 doesn’t erase version 1.</p>
-        </div>
-      </div>
-      <p class="workflow-note fade-in">Private beta focuses on inspection, risk visibility, and decision support. Not every step is fully automated yet — and we won’t pretend it is.</p>
-    </div>
-  </section>
-
-  <!-- 4. What you get -->
-  <section id="deliverables">
-    <div class="container">
-      <div class="fade-in section-header">
-        <span class="section-label">What You Get</span>
-        <h2>Tangible outputs you can act on.</h2>
-        <p class="section-desc">Artifacts meant to make the app clearer to trust, safer to change, and easier to prioritize.</p>
-      </div>
-      <ul class="deliverable-list">
-        <li class="fade-in">
-          <span class="check-icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span><strong>App structure map</strong> A readable picture of modules, flows, and dependencies as they exist today.</span>
-        </li>
-        <li class="fade-in" style="transition-delay: 0.05s;">
-          <span class="check-icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span><strong>Risk findings</strong> Documented weak points and assumptions that make change expensive or unsafe.</span>
-        </li>
-        <li class="fade-in" style="transition-delay: 0.1s;">
-          <span class="check-icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span><strong>Proof / verification baseline</strong> What can be checked now, what’s missing, and where evidence should come from.</span>
-        </li>
-        <li class="fade-in" style="transition-delay: 0.15s;">
-          <span class="check-icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span><strong>Keep / repair / rebuild framing</strong> A grounded recommendation path so you invest effort where it compounds.</span>
-        </li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- 5. Why not another AI -->
-  <section id="why-not-ai">
-    <div class="container">
-      <div class="fade-in section-header centered">
-        <span class="section-label">Why Not Another Prompt</span>
-        <h2>Another AI chat is not a reliability layer.</h2>
-        <p class="section-desc">Asking a model to “fix it” can patch symptoms. It rarely gives you durable evidence or a controlled path forward.</p>
-      </div>
-      <div class="compare-grid">
-        <div class="fade-in compare-card">
-          <h3>Blind re-prompting</h3>
-          <ul>
-            <li>Patches local symptoms without a system map</li>
-            <li>Easy to reintroduce the same failures</li>
-            <li>Hard to know what actually got verified</li>
-            <li>Burns tokens without a decision framework</li>
-          </ul>
-        </div>
-        <div class="fade-in compare-card accented" style="transition-delay: 0.08s;">
-          <h3>App Rescue approach</h3>
-          <ul>
-            <li>Starts from the app you already have</li>
-            <li>Surfaces risk before more code lands</li>
-            <li>Builds toward proof-backed confidence</li>
-            <li>Frames keep / repair / rebuild explicitly</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 6. Keep / repair / rebuild -->
-  <section id="decision">
-    <div class="container">
-      <div class="fade-in section-header centered">
-        <span class="section-label">Decision Framing</span>
-        <h2>Keep. Repair. Rebuild.</h2>
-        <p class="section-desc">Not every AI-built app needs a rewrite. The expensive mistake is guessing which path you’re on.</p>
-      </div>
-      <div class="decision-grid">
-        <div class="fade-in decision-card">
-          <span class="tag">Keep</span>
-          <h3>Stabilize what works</h3>
-          <p>Core flows are sound. Document them, verify them, and avoid accidental churn while you ship carefully.</p>
-        </div>
-        <div class="fade-in decision-card" style="transition-delay: 0.06s;">
-          <span class="tag">Repair</span>
-          <h3>Harden the weak spots</h3>
-          <p>Structure is salvageable, but validation, auth, data handling, or tests need focused repair before scale.</p>
-        </div>
-        <div class="fade-in decision-card" style="transition-delay: 0.12s;">
-          <span class="tag">Rebuild</span>
-          <h3>Reset on purpose</h3>
-          <p>When foundations won’t carry the product, rebuild with clarity — informed by what the v1 already taught you.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 7. Who it's for -->
-  <section id="audience">
-    <div class="container">
-      <div class="fade-in section-header">
-        <span class="section-label">Who It’s For</span>
-        <h2>Built for people who already have a v1.</h2>
-        <p class="section-desc">Text-only fit check — no logos, no fabricated social proof. If this sounds like you, the private beta is the next step.</p>
-      </div>
-      <div class="audience-grid">
-        <div class="fade-in audience-item">
-          <h3>Founders with an AI-built MVP</h3>
-          <p>You shipped fast. Now you need confidence before users, payments, or investors lean on it.</p>
-        </div>
-        <div class="fade-in audience-item" style="transition-delay: 0.05s;">
-          <h3>Builders using coding agents</h3>
-          <p>You can generate more code tomorrow. You need to know which parts are safe to extend today.</p>
-        </div>
-        <div class="fade-in audience-item" style="transition-delay: 0.1s;">
-          <h3>Teams inheriting a prototype</h3>
-          <p>Someone else generated v1. You own the risk of changing it — and want evidence, not vibes.</p>
-        </div>
-        <div class="fade-in audience-item" style="transition-delay: 0.15s;">
-          <h3>Operators of internal tools</h3>
-          <p>The tool works… until it doesn’t. You want a clearer map before the next feature request.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 8. Private beta form -->
-  <section id="beta">
-    <div class="container">
-      <div class="beta-layout">
-        <div class="fade-in">
-          <span class="section-label">Private Beta</span>
-          <h2>Request private beta access.</h2>
-          <p class="section-desc" style="margin-top: 16px;">We’re looking for builders who already have an AI-built app, MVP, internal tool, or prototype — and want it safer to ship, maintain, or evolve.</p>
-          <p class="section-desc" style="margin-top: 18px; font-size: 14px; color: var(--text-muted);">Early access is limited. We review each request and follow up where App Rescue is likely to help.</p>
-        </div>
-        <div class="fade-in" style="transition-delay: 0.1s;">
-          <div class="beta-form-wrap">
+          <div class="form-panel">
             <form
               id="beta-signup-form"
               name="beta-signup"
@@ -1065,173 +520,128 @@
               action="/"
               data-netlify="true"
               netlify-honeypot="bot-field"
-              novalidate
             >
               <input type="hidden" name="form-name" value="beta-signup" />
-
               <p hidden>
                 <label>Don’t fill this out: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
               </p>
-
               <div class="form-field">
-                <label for="email">Email address <span class="required-mark">*</span></label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  placeholder="you@example.com"
-                  autocomplete="email"
-                  required
-                />
-                <div class="field-error" id="email-error">Please enter a valid email address.</div>
+                <label for="email">Email address <span aria-hidden="true">*</span></label>
+                <input type="email" id="email" name="email" autocomplete="email" required />
+                <p class="field-error" id="email-error" hidden>Enter a valid email address.</p>
               </div>
-
               <div class="form-field">
-                <label for="built_with">What did you build it with? <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
-                <input
-                  type="text"
-                  id="built_with"
-                  name="built_with"
-                  placeholder="AI app builder, coding agent, no-code tool, agency, custom code…"
-                  autocomplete="off"
-                />
+                <label for="built_with">What did you build it with? <span class="optional">(optional)</span></label>
+                <input type="text" id="built_with" name="built_with" autocomplete="off" />
               </div>
-
               <div class="form-field">
-                <label for="biggest_issue">What is your biggest issue right now? <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
-                <textarea
-                  id="biggest_issue"
-                  name="biggest_issue"
-                  placeholder="bugs, auth, database, scaling, feature changes, not sure…"
-                  rows="3"
-                ></textarea>
+                <label for="biggest_issue">What is your biggest issue right now? <span class="optional">(optional)</span></label>
+                <textarea id="biggest_issue" name="biggest_issue" rows="4"></textarea>
               </div>
-
-              <button type="submit" class="btn-submit" id="submit-btn">
-                <span class="spinner" aria-hidden="true"></span>
-                <span class="btn-text">Request Private Beta Access</span>
-              </button>
+              <button type="submit" class="btn-submit" id="submit-btn">Send inquiry</button>
             </form>
-
-            <div class="form-success" id="form-success">
-              <div class="success-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M5 12l5 5L20 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <h3>Request received.</h3>
-              <p>We’ll be in touch if your project is a fit for the private beta.</p>
+            <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+            <div class="form-success" id="form-success" hidden>
+              <h3>The host accepted this inquiry request.</h3>
+              <p>That is not an accepted order, a scheduled assessment, or a delivery promise. If it is reviewed, any reply will use the email you submitted.</p>
             </div>
+            <noscript>
+              <p class="fine">JavaScript is off. The form will use a normal browser POST. You will leave this page if the host accepts it.</p>
+            </noscript>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <section id="final-cta">
-    <div class="container">
-      <div class="fade-in final-cta-text">
-        <strong>Bring your v1.</strong> Find out what you can trust before you change it.
-      </div>
-      <div class="fade-in" style="transition-delay: 0.08s;">
-        <a href="#beta" class="btn-primary">
-          Request Private Beta Access
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a>
-      </div>
-      <p class="final-tagline fade-in" style="transition-delay: 0.16s;">App Rescue is where AI-built apps get proof before the next leap.</p>
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>AppRescue</strong> · inquiry via the form above · no ads or partner tracking on this page</p>
+      <p>WCAG 2.2 AA is a design target for this page, not a certification claim. Social-image preview for SVG is not verified for every crawler; a raster preview is deferred.</p>
     </div>
-  </section>
-
-  <footer>
-    <div class="footer-logo">App <span>Rescue</span></div>
-    <div class="footer-note">© AppRescue.ai · Private beta · Limited early access</div>
   </footer>
 
-  <script>
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('visible');
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  <script id="homepage-ui">
+  (function () {
+    'use strict';
+    var form = document.getElementById('beta-signup-form');
+    var submitBtn = document.getElementById('submit-btn');
+    var emailInput = document.getElementById('email');
+    var emailError = document.getElementById('email-error');
+    var statusEl = document.getElementById('form-status');
+    var successEl = document.getElementById('form-success');
+    if (!form || !submitBtn || !emailInput || !emailError || !statusEl || !successEl) return;
 
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    var pending = false;
+    var timeoutMs = 15000;
 
-    const form = document.getElementById('beta-signup-form');
-    const submitBtn = document.getElementById('submit-btn');
-    const emailInput = document.getElementById('email');
-    const emailError = document.getElementById('email-error');
-    const successState = document.getElementById('form-success');
-
-    function isValidEmail(val) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+    function validEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
     }
 
-    function setError(input, errorEl, show) {
-      if (show) {
-        input.classList.add('error');
-        errorEl.classList.add('visible');
-      } else {
-        input.classList.remove('error');
-        errorEl.classList.remove('visible');
-      }
+    function showEmailError(show) {
+      emailInput.classList.toggle('error', show);
+      emailInput.setAttribute('aria-invalid', show ? 'true' : 'false');
+      emailError.hidden = !show;
     }
 
-    emailInput.addEventListener('input', () => {
-      if (emailInput.value && !isValidEmail(emailInput.value)) {
-        setError(emailInput, emailError, true);
-      } else {
-        setError(emailInput, emailError, false);
-      }
+    function setStatus(text, state) {
+      statusEl.textContent = text;
+      if (state) statusEl.setAttribute('data-state', state);
+      else statusEl.removeAttribute('data-state');
+    }
+
+    emailInput.addEventListener('input', function () {
+      if (emailInput.value && !validEmail(emailInput.value)) showEmailError(true);
+      else showEmailError(false);
     });
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (pending) return;
 
-      if (!emailInput.value.trim() || !isValidEmail(emailInput.value)) {
-        setError(emailInput, emailError, true);
+      if (!validEmail(emailInput.value)) {
+        showEmailError(true);
         emailInput.focus();
+        setStatus('Email is required and must look like an email address.', 'err');
         return;
       }
 
-      setError(emailInput, emailError, false);
+      showEmailError(false);
+      pending = true;
       submitBtn.disabled = true;
-      submitBtn.classList.add('loading');
+      setStatus('Sending inquiry…', '');
 
-      try {
-        const response = await fetch('/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(new FormData(form)).toString(),
-        });
+      var controller = new AbortController();
+      var timer = setTimeout(function () { controller.abort(); }, timeoutMs);
 
-        if (response.ok) {
-          form.style.display = 'none';
-          successState.classList.add('visible');
-        } else {
-          throw new Error('Submission failed');
+      fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(new FormData(form)).toString(),
+        signal: controller.signal
+      }).then(function (response) {
+        clearTimeout(timer);
+        if (!response.ok) {
+          throw new Error('HTTP_' + response.status);
         }
-      } catch (err) {
+        form.hidden = true;
+        successEl.hidden = false;
+        setStatus('The host returned a successful response. Local tests can mock this; they do not prove Netlify stored the inquiry.', 'ok');
+      }).catch(function (err) {
+        clearTimeout(timer);
+        pending = false;
         submitBtn.disabled = false;
-        submitBtn.classList.remove('loading');
-        form.submit();
-      }
-    });
-
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', (e) => {
-        const sel = anchor.getAttribute('href');
-        if (!sel || sel === '#') return;
-        const target = document.querySelector(sel);
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        var timedOut = err && err.name === 'AbortError';
+        setStatus(
+          timedOut
+            ? 'The request timed out. Your answers are still in the form. Try again, or submit with JavaScript disabled.'
+            : 'The inquiry could not be sent. Your answers are still in the form. Check the connection and try again, or submit with JavaScript disabled.',
+          'err'
+        );
       });
     });
+  })();
   </script>
-
 </body>
 </html>

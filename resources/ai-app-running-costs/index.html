@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI app running costs: builder vs operation — AppRescue</title>
+<meta name="description" content="Why an AI app-builder subscription is not the same as the cost of running the deployed app. Credits, usage, budgets, domains, email, and databases, with primary-source citations.">
+<link rel="canonical" href="https://apprescue.ai/resources/ai-app-running-costs/">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="index,follow">
+<style>
+:root{color-scheme:dark;--bg:#0b1017;--panel:#141d29;--line:#2c394b;--text:#edf3fa;--muted:#b3c2d3;--accent:#78ead7;--warning:#ffd398}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden;overflow-wrap:anywhere}a{color:var(--accent)}a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}header,main,footer{width:min(860px,calc(100% - 32px));margin:auto}header{padding:20px 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:16px;flex-wrap:wrap}header a{text-decoration:none}nav{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}.brand{font-weight:800;font-size:20px;color:var(--text)}.brand span{color:var(--accent)}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:750}.hero{padding:40px 0 12px}h1{font-size:clamp(30px,6vw,46px);line-height:1.15;letter-spacing:-.03em;margin:12px 0 16px}h2{font-size:22px;margin:28px 0 10px}p,li{margin:0 0 12px}ul,ol{padding-left:22px}.lead,.fine,figcaption{color:var(--muted)}.fine{font-size:13px}.notice{padding:14px 18px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;color:var(--muted);margin:18px 0}.cite{font-size:13px;color:var(--muted)}.skip{position:absolute;left:8px;top:-60px;background:var(--text);color:var(--bg);padding:12px;z-index:10}.skip:focus{top:8px}footer{padding:28px 0;color:var(--muted);font-size:13px}@media(max-width:720px){header{align-items:flex-start}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+  <a class="brand" href="https://apprescue.ai/">App<span>Rescue</span></a>
+  <nav aria-label="Resources">
+    <a href="/resources/">Hub</a>
+    <a href="/resources/app-cost-calculator/">Calculator</a>
+    <a href="/resources/ai-app-running-costs/">Running costs</a>
+    <a href="/resources/app-portability-checklist/">Portability</a>
+    <a href="/resources/editorial-policy/">Editorial policy</a>
+    <a href="/release-evidence/">Release evidence</a>
+  </nav>
+</header>
+<main id="main">
+  <section class="hero">
+    <p class="eyebrow">Guide · documents, not a live bill audit</p>
+    <h1>The builder plan is not the running bill.</h1>
+    <p class="lead">Paying for an AI app builder buys time in the editor. The deployed app can still consume hosting, database, bandwidth, email, and model calls. Those lines can share a credit balance or sit on a usage invoice. They are still a different job than “send another prompt.”</p>
+    <p class="fine">Author: AppRescue. Reviewed 13 September 2026 from primary vendor documentation. This page does not quote a current price list or name a cheaper vendor.</p>
+  </section>
+
+  <div class="notice"><strong>Use your own numbers.</strong> Put invoice figures into the <a href="/resources/app-cost-calculator/">running-cost calculator</a>. Hypothetical calculator examples are not vendor presets. Before you hand an app to a client, pair this with the <a href="/release-evidence/">Release Evidence Check</a>.</div>
+
+  <h2>Two meters, even when they share a wallet</h2>
+  <p>Lovable’s credits-and-usage documentation describes one workspace credit balance that pays for three different usage types: build messages in the editor, Cloud usage for hosting and the built-in backend, and AI gateway usage for model calls the deployed app makes. Usage-specific grants (daily build credits, a monthly Cloud grant, a monthly AI grant) are spent first; leftover Cloud or AI use then draws general credits so a live app can keep running after a grant empties. Unused usage-specific grants do not roll over. <span class="cite">Source: <a href="https://docs.lovable.dev/introduction/credits-and-usage" rel="noopener noreferrer">Lovable, Credits and usage</a>.</span></p>
+  <p>That design is why a “quiet” month in the editor is not proof of a quiet production month. A published app can still burn Cloud and AI gateway credits while nobody opens the builder.</p>
+  <p>Replit’s publishing-and-database billing documentation meters a different split: outbound data transfer, Autoscale compute units, and request counts for published apps, plus compute time and storage for production PostgreSQL. Development databases are described as free; production databases are not. Only egress counts against the outbound-transfer allowance; ingress is described as free. Autoscale compute units combine RAM-seconds and CPU-seconds. Static deployments are described as not consuming compute units. <span class="cite">Source: <a href="https://docs.replit.com/billing/about-usage-based-billing" rel="noopener noreferrer">Replit, Publishing and Database Billing</a>.</span></p>
+
+  <h2>Credits, grants, and variable usage</h2>
+  <p>Treat credits as a prepaid unit, not as a cap. On Lovable, Cloud usage is driven by database instance size and activity, database storage, network, file storage, compute, and realtime traffic. AI gateway usage is separate from the builder agent and scales with model, tokens, and call volume. When the workspace balance hits zero, Lovable’s documentation says building stops, deployed AI features fail, and built-in backend services can pause shortly afterward; the published site can stay up while the backend is paused. Data remains, but the same page says you cannot access or export Cloud data until services run again. <span class="cite">Source: <a href="https://docs.lovable.dev/introduction/credits-and-usage" rel="noopener noreferrer">Lovable, Credits and usage</a>.</span></p>
+  <p>On Replit, publishing overages and production-database hours accumulate against monthly credits, then bill when usage exceeds those credits or at the monthly cycle. A production database stays “active” while it receives requests and for an additional five minutes; idle databases suspend. Empty PostgreSQL still occupies a documented default storage footprint. <span class="cite">Source: <a href="https://docs.replit.com/billing/about-usage-based-billing" rel="noopener noreferrer">Replit, Publishing and Database Billing</a>.</span></p>
+  <p>When you model this in the calculator, included allowance is subtracted from usage units once. Do not also subtract it as a dollar credit.</p>
+
+  <h2>Budgets and billing settings are not a guaranteed spend cap</h2>
+  <p>Lovable documents auto top-up with a threshold, a top-up amount, and an optional monthly spend limit for automatic purchases. Long-running build check-ins are described as a notification threshold, not a hard cap; a run can pass the level before it pauses. Member credit limits apply to build usage only; Cloud and AI gateway (run) usage do not count against a member’s monthly build limit. <span class="cite">Source: <a href="https://docs.lovable.dev/introduction/credits-and-usage" rel="noopener noreferrer">Lovable, Credits and usage</a>.</span></p>
+  <p>Replit documents usage limits and a service shutdown limit under Settings → Account → Usage → Manage limits, plus credit packs that expire six months after purchase and do not roll over. Usage limits and budgets apply after credit packs are consumed. Auto-reload can buy another pack when the balance is low. Those controls can block further usage-based services after a limit; they are not a promise that every charge path is covered, or that a published app will degrade gracefully. <span class="cite">Source: <a href="https://docs.replit.com/billing/managing-spend" rel="noopener noreferrer">Replit, Managing Your Spend</a>.</span></p>
+  <p>We do not guarantee that any slider you set will cap spend. Verify the current wording in your own billing UI; vendor copy changes.</p>
+
+  <h2>Domain, email, and database are separate lines</h2>
+  <p>A custom domain is usually paid to a registrar and pointed with DNS you control. That invoice is not the builder subscription. Transactional email is typically a connector or a third-party provider; Replit’s project-help documentation describes connecting a service such as Resend through Tools → Connectors and adding DNS records at your DNS provider. <span class="cite">Source: <a href="https://docs.replit.com/help/projects-and-files" rel="noopener noreferrer">Replit, Projects and files</a>.</span></p>
+  <p>Database cost follows production data and instance size, not the fact that a table exists in development. Lovable Cloud instance size and storage are managed under More → Cloud → Overview → Advanced settings; a larger instance uses more credits as the app runs, and paused Cloud still incurs storage because data stays in place. <span class="cite">Source: <a href="https://docs.lovable.dev/features/advanced-settings" rel="noopener noreferrer">Lovable, Advanced settings</a>.</span></p>
+
+  <h2>Verification steps (your account, your figures)</h2>
+  <ol>
+    <li>Open the vendor billing screen named in the docs above (Lovable: Settings → Plans &amp; credit usage and Usage details; Replit: Settings → Account → Account usage). Record the observation date.</li>
+    <li>Split last month into builder/editor usage versus published-app usage (Cloud / run credits, outbound transfer, compute units, production database hours).</li>
+    <li>Write down included grants or allowances and any overage. Do not assume unused grants roll over unless the current docs say they do.</li>
+    <li>Confirm whether auto top-up, auto-reload, or a usage limit is on, and what happens at zero balance (pause, blocked usage, or continued storage charges).</li>
+    <li>Enter those numbers in the <a href="/resources/app-cost-calculator/">calculator</a>. Leave unknown fields blank.</li>
+    <li>If you are preparing a handoff, record what you actually tested in the <a href="/release-evidence/">Release Evidence Check</a>.</li>
+  </ol>
+
+  <h2>Sources</h2>
+  <ul>
+    <li><a href="https://docs.lovable.dev/introduction/credits-and-usage" rel="noopener noreferrer">https://docs.lovable.dev/introduction/credits-and-usage</a></li>
+    <li><a href="https://docs.lovable.dev/features/advanced-settings" rel="noopener noreferrer">https://docs.lovable.dev/features/advanced-settings</a></li>
+    <li><a href="https://docs.replit.com/billing/about-usage-based-billing" rel="noopener noreferrer">https://docs.replit.com/billing/about-usage-based-billing</a></li>
+    <li><a href="https://docs.replit.com/billing/managing-spend" rel="noopener noreferrer">https://docs.replit.com/billing/managing-spend</a></li>
+    <li><a href="https://docs.replit.com/help/projects-and-files" rel="noopener noreferrer">https://docs.replit.com/help/projects-and-files</a></li>
+  </ul>
+  <p class="fine">Links are ordinary unpaid documentation links. See the <a href="/resources/editorial-policy/">editorial policy</a>. Refresh due 13 October 2026 or sooner if a cited page changes.</p>
+</main>
+<footer>
+  <p><a href="https://apprescue.ai/#beta">AppRescue beta consideration</a> is our own service, not a certification.</p>
+</footer>
+</body>
+</html>

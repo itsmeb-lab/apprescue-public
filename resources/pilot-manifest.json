@@ -1,0 +1,83 @@
+{
+  "kind": "PUBLIC_EDITORIAL_MANIFEST",
+  "manifest_version": "organic-utility-pilot-v1",
+  "pgp_native_output": false,
+  "pgp_executed": false,
+  "publication_status": "CANDIDATE",
+  "affiliate_links_enabled": false,
+  "measured_search_demand": "UNKNOWN",
+  "author": "AppRescue",
+  "reviewed_at": "2026-09-13",
+  "refresh_due_at": "2026-10-13",
+  "relationship_disclosure_status": "NO_PAID_LINKS_ORDINARY_UNPAID_LINKS",
+  "notes": "Explicit editorial handoff for a later PGP adopter ingest. Not a claimed native PGP run, search-volume record, or deploy evidence.",
+  "assets": [
+    {
+      "id": "editorial-resources-hub-v1",
+      "canonical_url": "https://apprescue.ai/resources/",
+      "intent": "Index the utility cluster and the existing release-evidence tool.",
+      "unique_value": "One short hub that names the calculator, two sourced guides, editorial policy, and Release Evidence Check without vendor ranking.",
+      "primary_source_refs": [],
+      "publication_status": "CANDIDATE",
+      "affiliate_links_enabled": false,
+      "measured_search_demand": "UNKNOWN"
+    },
+    {
+      "id": "editorial-app-cost-calculator-v1",
+      "canonical_url": "https://apprescue.ai/resources/app-cost-calculator/",
+      "intent": "Let a reader compute a USD running-cost budget from their own figures.",
+      "unique_value": "Integer-cent planner that keeps blanks unknown, models allowance without double subtraction, and exports JSON.",
+      "primary_source_refs": [],
+      "publication_status": "CANDIDATE",
+      "affiliate_links_enabled": false,
+      "measured_search_demand": "UNKNOWN"
+    },
+    {
+      "id": "editorial-ai-app-running-costs-v1",
+      "canonical_url": "https://apprescue.ai/resources/ai-app-running-costs/",
+      "intent": "Explain why builder subscription and deployed-app operation can be separate cost jobs.",
+      "unique_value": "Primary-source walkthrough of Lovable credits/Cloud and Replit publishing/database billing without quoting a price list.",
+      "primary_source_refs": [
+        "https://docs.lovable.dev/introduction/credits-and-usage",
+        "https://docs.lovable.dev/features/advanced-settings",
+        "https://docs.replit.com/billing/about-usage-based-billing",
+        "https://docs.replit.com/billing/managing-spend",
+        "https://docs.replit.com/help/projects-and-files"
+      ],
+      "publication_status": "CANDIDATE",
+      "affiliate_links_enabled": false,
+      "measured_search_demand": "UNKNOWN"
+    },
+    {
+      "id": "editorial-app-portability-checklist-v1",
+      "canonical_url": "https://apprescue.ai/resources/app-portability-checklist/",
+      "intent": "List what must be collected before switching app builders.",
+      "unique_value": "Distinguishes a code export from a deployable replacement using verified Lovable and Replit export docs.",
+      "primary_source_refs": [
+        "https://docs.lovable.dev/integrations/github",
+        "https://docs.lovable.dev/features/advanced-settings",
+        "https://docs.lovable.dev/introduction/credits-and-usage",
+        "https://docs.replit.com/help/projects-and-files",
+        "https://docs.replit.com/features/workspace-tools/git-interface",
+        "https://docs.replit.com/features/data-and-storage/work-with-your-data"
+      ],
+      "publication_status": "CANDIDATE",
+      "affiliate_links_enabled": false,
+      "measured_search_demand": "UNKNOWN"
+    },
+    {
+      "id": "editorial-policy-v1",
+      "canonical_url": "https://apprescue.ai/resources/editorial-policy/",
+      "intent": "State authorship, evidence types, unpaid-link status, and future paid-link rules.",
+      "unique_value": "Names the required commission sentence and sponsored relationship attribute without enabling paid links.",
+      "primary_source_refs": [
+        "https://developers.google.com/search/docs/essentials/spam-policies",
+        "https://developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl",
+        "https://www.ftc.gov/business-guidance/resources/ftcs-endorsement-guides-what-people-are-asking"
+      ],
+      "publication_status": "CANDIDATE",
+      "affiliate_links_enabled": false,
+      "measured_search_demand": "UNKNOWN"
+    }
+  ]
+}

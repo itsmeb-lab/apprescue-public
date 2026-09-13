@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App portability checklist before switching builders — AppRescue</title>
+<meta name="description" content="A practical checklist before leaving an AI app builder: source export, database export, auth ownership, environment-variable names, DNS, licenses, restore rehearsal, and rollback.">
+<link rel="canonical" href="https://apprescue.ai/resources/app-portability-checklist/">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="index,follow">
+<style>
+:root{color-scheme:dark;--bg:#0b1017;--panel:#141d29;--line:#2c394b;--text:#edf3fa;--muted:#b3c2d3;--accent:#78ead7;--warning:#ffd398}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden;overflow-wrap:anywhere}a{color:var(--accent)}a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:4px}header,main,footer{width:min(860px,calc(100% - 32px));margin:auto}header{padding:20px 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:16px;flex-wrap:wrap}header a{text-decoration:none}nav{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}.brand{font-weight:800;font-size:20px;color:var(--text)}.brand span{color:var(--accent)}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:750}.hero{padding:40px 0 12px}h1{font-size:clamp(30px,6vw,46px);line-height:1.15;letter-spacing:-.03em;margin:12px 0 16px}h2{font-size:22px;margin:28px 0 10px}h3{font-size:18px;margin:0 0 8px}p,li{margin:0 0 12px}ul{padding-left:22px}.lead,.fine{color:var(--muted)}.fine{font-size:13px}.notice{padding:14px 18px;border:1px solid var(--line);border-left:3px solid var(--warning);border-radius:8px;color:var(--muted);margin:18px 0}.check{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:12px 0}.check label{display:flex;gap:10px;align-items:flex-start;font-weight:650}.check input{margin-top:5px;flex:0 0 auto;accent-color:var(--accent);width:18px;height:18px}.skip{position:absolute;left:8px;top:-60px;background:var(--text);color:var(--bg);padding:12px;z-index:10}.skip:focus{top:8px}footer{padding:28px 0;color:var(--muted);font-size:13px}@media(max-width:720px){header{align-items:flex-start}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+  <a class="brand" href="https://apprescue.ai/">App<span>Rescue</span></a>
+  <nav aria-label="Resources">
+    <a href="/resources/">Hub</a>
+    <a href="/resources/app-cost-calculator/">Calculator</a>
+    <a href="/resources/ai-app-running-costs/">Running costs</a>
+    <a href="/resources/app-portability-checklist/">Portability</a>
+    <a href="/resources/editorial-policy/">Editorial policy</a>
+    <a href="/release-evidence/">Release evidence</a>
+  </nav>
+</header>
+<main id="main">
+  <section class="hero">
+    <p class="eyebrow">Checklist · self-reported, not an automated scan</p>
+    <h1>A code export is not a working replacement.</h1>
+    <p class="lead">Before you switch AI app builders, collect the pieces the destination will not invent for you. A repository or zip can hold source files and still omit the database, auth provider ownership, secrets, DNS, and a practiced rollback.</p>
+    <p class="fine">Author: AppRescue. Reviewed 13 September 2026. This page does not solicit secret values and does not claim your app is secure or correctly migrated.</p>
+  </section>
+
+  <div class="notice"><strong>Never paste secrets here.</strong> Checkboxes stay in this tab only. Record environment-variable <em>names</em>, not values. Pair cost questions with the <a href="/resources/app-cost-calculator/">running-cost calculator</a> and test evidence with the <a href="/release-evidence/">Release Evidence Check</a>.</div>
+
+  <h2>Portability checks</h2>
+
+  <div class="check">
+    <label><input type="checkbox" name="source-export"> <span>Source export exists in a place you control.</span></label>
+    <p class="fine">Lovable documents GitHub/GitLab/Bitbucket sync and a Download codebase action in Project settings → Git or at the bottom of the code-editor file tree (paid plans). Replit documents Download as zip from the file-tree three-dot menu, with a Shell zip fallback, plus a Git pane for a connected remote. <a href="https://docs.lovable.dev/integrations/github" rel="noopener noreferrer">Lovable GitHub docs</a> · <a href="https://docs.replit.com/help/projects-and-files" rel="noopener noreferrer">Replit projects and files</a> · <a href="https://docs.replit.com/features/workspace-tools/git-interface" rel="noopener noreferrer">Replit Git pane</a>.</p>
+  </div>
+  <div class="check">
+    <label><input type="checkbox" name="database-export"> <span>Database export is separate from the source zip.</span></label>
+    <p class="fine">Lovable Cloud export is More → Cloud → Overview → Advanced settings → Export project data. The official page says the file includes schema and table data, not storage files, Edge Function code, secrets, or usable user passwords; one export per 24 hours; export file at most 5 GB. You cannot download exports after Cloud is removed, and credits-and-usage docs say Cloud data cannot be accessed or exported while services are paused at zero balance. Replit’s data tools document export from Database → My Data. Replit also states that copying a project to another account does not include the database, secrets, or deployment configuration. <a href="https://docs.lovable.dev/features/advanced-settings" rel="noopener noreferrer">Lovable Advanced settings</a> · <a href="https://docs.replit.com/features/data-and-storage/work-with-your-data" rel="noopener noreferrer">Replit, Work with your data</a> · <a href="https://docs.replit.com/help/projects-and-files" rel="noopener noreferrer">Replit projects and files</a>.</p>
+  </div>
+  <div class="check">
+    <label><input type="checkbox" name="auth-ownership"> <span>Auth ownership and configuration are written down (no passwords).</span></label>
+    <p class="fine">Note which provider owns users, where the callback URLs live, and whether password hashes will survive a move. Lovable’s export notes say user passwords are not exported in usable form, so plan a reset flow. This is configuration ownership, not a security audit.</p>
+  </div>
+  <div class="check">
+    <label><input type="checkbox" name="env-names"> <span>Environment-variable <em>names</em> are listed. Values stay out of this page and out of chat logs.</span></label>
+    <p class="fine">Replit keeps development Secrets separate from deployment secrets by design. Lovable distinguishes backend Secrets from browser-exposed <code>VITE_</code> names. Write names only: <code>DATABASE_URL</code>, <code>RESEND_API_KEY</code>, never the secret itself.</p>
+  </div>
+  <div class="check">
+    <label><input type="checkbox" name="dns"> <span>Domain and DNS control sit in an account you can log into without the old builder.</span></label>
+    <p class="fine">Registrar login, DNS host, and TTL for apex and <code>www</code> records. A builder-issued preview URL is not domain ownership.</p>
+  </div>
+  <div class="check">
+    <label><input type="checkbox" name="licenses"> <span>Dependency and license review is recorded for the exported lockfile.</span></label>
+    <p class="fine">An installable zip does not establish that every package may be redistributed or that a clean install succeeds on the destination.</p>
+  </div>
+  <div class="check">
+    <label><input type="checkbox" name="restore"> <span>A non-production restore rehearsal succeeded.</span></label>
+    <p class="fine">Restore synthetic or authorized test data into a staging project. Confirm the app boots, migrations apply, and a critical workflow runs. Presence of an export file is not a restore.</p>
+  </div>
+  <div class="check">
+    <label><input type="checkbox" name="rollback"> <span>Rollback is a practiced path, not a button you have never pressed.</span></label>
+    <p class="fine">Replit’s project-help page states it no longer supports rolling a published app back to a previous version; the documented path is roll the project to a checkpoint, then publish again. Lovable Cloud removal permanently deletes the instance. Keep the previous builder available until the new deploy is rehearsed. <a href="https://docs.replit.com/help/projects-and-files" rel="noopener noreferrer">Replit projects and files</a>.</p>
+  </div>
+
+  <h2>What this does not prove</h2>
+  <ul>
+    <li>That the destination host will accept the export, or that the app is deployable there.</li>
+    <li>That auth, payments, or file storage were migrated correctly.</li>
+    <li>Any automated security or correctness claim.</li>
+  </ul>
+  <p>Checkboxes are a memory aid in this browser tab. They are not uploaded and they are not an AppRescue certification. <a href="https://apprescue.ai/#beta">AppRescue beta consideration</a> is our own service, not a stamp that a migration is safe.</p>
+
+  <h2>Sources</h2>
+  <ul>
+    <li><a href="https://docs.lovable.dev/integrations/github" rel="noopener noreferrer">https://docs.lovable.dev/integrations/github</a></li>
+    <li><a href="https://docs.lovable.dev/features/advanced-settings" rel="noopener noreferrer">https://docs.lovable.dev/features/advanced-settings</a></li>
+    <li><a href="https://docs.lovable.dev/introduction/credits-and-usage" rel="noopener noreferrer">https://docs.lovable.dev/introduction/credits-and-usage</a></li>
+    <li><a href="https://docs.replit.com/help/projects-and-files" rel="noopener noreferrer">https://docs.replit.com/help/projects-and-files</a></li>
+    <li><a href="https://docs.replit.com/features/workspace-tools/git-interface" rel="noopener noreferrer">https://docs.replit.com/features/workspace-tools/git-interface</a></li>
+    <li><a href="https://docs.replit.com/features/data-and-storage/work-with-your-data" rel="noopener noreferrer">https://docs.replit.com/features/data-and-storage/work-with-your-data</a></li>
+  </ul>
+  <p class="fine">Vendor-neutral where a capability was not in those pages. Unpaid documentation links only. <a href="/resources/editorial-policy/">Editorial policy</a>.</p>
+</main>
+<footer>
+  <p>Reviewed 13 September 2026. Refresh due 13 October 2026 or sooner if a cited export path changes.</p>
+</footer>
+</body>
+</html>

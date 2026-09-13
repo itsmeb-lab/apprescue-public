@@ -8,7 +8,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const http = require('node:http');
-const { spawn } = require('node:child_process');
+const { spawn, spawnSync } = require('node:child_process');
 
 const ROOT = path.join(__dirname, '..');
 const C = require(path.join(ROOT, 'resources/app-cost-calculator/cost-engine.js'));
@@ -259,71 +259,198 @@ test('sitemap lists only the five resource routes', () => {
   assert.doesNotMatch(sitemap, /https:\/\/apprescue\.ai\/(?:\"|$|index)/);
 });
 
-test('publication bundle allowlist, digest, and overwrite guard', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'organic-pub-'));
-  const out = path.join(tmp, 'bundle');
-  const { spawnSync } = require('node:child_process');
-  const first = spawnSync(process.execPath, [path.join(ROOT, 'scripts/build-organic-publication.cjs'), out], { encoding: 'utf8' });
-  assert.equal(first.status, 0, first.stderr);
-  const report = JSON.parse(first.stdout);
-  const allowed = new Set([
+const PR4_SHA = '4185bc253463e9b371c6737f433fc60947679231';
+const PR4_PARENT = '5e9b5a849d729ba322a9fba9fff4470cc8e3212f';
+const PR4_ADDED = [
+  'resources/ai-app-running-costs/index.html',
+  'resources/app-cost-calculator/cost-engine.js',
+  'resources/app-cost-calculator/index.html',
+  'resources/app-portability-checklist/index.html',
+  'resources/editorial-policy/index.html',
+  'resources/index.html',
+  'resources/pilot-manifest.json',
+  'resources/sitemap.xml',
+  'scripts/build-organic-publication.cjs',
+  'tests/organic-utility-pilot.test.cjs'
+];
+const REQUIRED_PUBLIC_ROUTES = [
+  'index.html',
+  'release-evidence/index.html',
+  'resources/index.html',
+  'resources/app-cost-calculator/index.html',
+  'resources/app-cost-calculator/cost-engine.js',
+  'resources/ai-app-running-costs/index.html',
+  'resources/app-portability-checklist/index.html',
+  'resources/editorial-policy/index.html',
+  'resources/sitemap.xml'
+];
+const HOMEPAGE_ASSET_CANDIDATES = [
+  'favicon.ico',
+  'favicon.png',
+  'favicon.svg',
+  'favicon.jpg',
+  'og-image.svg',
+  'og-image.png'
+];
+
+function runGit(args) {
+  return spawnSync('git', args, { cwd: ROOT, encoding: 'utf8' });
+}
+
+function gitMustRun(args) {
+  const result = runGit(args);
+  if (result.error) {
+    assert.fail(
+      'git is unavailable; cannot run ' + JSON.stringify(args) +
+      ' while authenticating PR4 ' + PR4_SHA + ' / parent ' + PR4_PARENT +
+      ': ' + result.error.message
+    );
+  }
+  assert.equal(
+    result.status,
+    0,
+    'git ' + args.join(' ') + ' failed (exit ' + result.status + '): ' +
+      String(result.stderr || result.stdout)
+  );
+  return result;
+}
+
+function homepageReferencesAllowedAsset(html, name) {
+  return (
+    html.includes('/' + name) ||
+    html.includes('https://apprescue.ai/' + name) ||
+    html.includes('https://www.apprescue.ai/' + name) ||
+    html.includes('http://apprescue.ai/' + name) ||
+    html.includes('http://www.apprescue.ai/' + name)
+  );
+}
+
+test('PR4 historical scope is the ten additions at exact SHA and parent', () => {
+  const inside = runGit(['rev-parse', '--is-inside-work-tree']);
+  if (inside.error) {
+    assert.fail(
+      'git is unavailable; cannot authenticate PR4 SHA ' + PR4_SHA +
+      ' / parent ' + PR4_PARENT + ': ' + inside.error.message
+    );
+  }
+  assert.equal(
+    inside.status,
+    0,
+    'git is not usable in this checkout (exit ' + inside.status + '): ' + String(inside.stderr)
+  );
+  assert.match(inside.stdout.trim(), /^true$/);
+
+  const gitPath = path.join(ROOT, '.git');
+  assert.equal(fs.existsSync(gitPath), true);
+  const gitStat = fs.lstatSync(gitPath);
+  assert.ok(
+    gitStat.isFile() || gitStat.isDirectory(),
+    'plain clone (.git directory) and linked worktree (.git file) must both be acceptable'
+  );
+
+  const sha = gitMustRun(['rev-parse', PR4_SHA]);
+  assert.equal(sha.stdout.trim(), PR4_SHA);
+  const parent = gitMustRun(['rev-parse', PR4_SHA + '^']);
+  assert.equal(parent.stdout.trim(), PR4_PARENT);
+
+  const tree = gitMustRun(['diff-tree', '--no-commit-id', '--name-status', '-r', PR4_SHA]);
+  const rows = tree.stdout.trim().split('\n').filter(Boolean);
+  assert.equal(rows.length, 10);
+  const added = [];
+  for (const row of rows) {
+    const [status, file] = row.split('\t');
+    assert.equal(status, 'A', row);
+    added.push(file);
+  }
+  assert.deepEqual(added.sort(), PR4_ADDED.slice().sort());
+
+  const existing = gitMustRun([
+    'diff',
+    '--name-only',
+    PR4_PARENT,
+    PR4_SHA,
+    '--',
     'index.html',
+    'netlify.toml',
     'release-evidence/index.html',
-    'resources/index.html',
-    'resources/app-cost-calculator/index.html',
-    'resources/app-cost-calculator/cost-engine.js',
-    'resources/ai-app-running-costs/index.html',
-    'resources/app-portability-checklist/index.html',
-    'resources/editorial-policy/index.html',
-    'resources/sitemap.xml'
+    'tests/release-evidence-check.test.cjs',
+    'README.md',
+    'BASELINE.md'
   ]);
-  assert.deepEqual(report.files.map((f) => f.path).sort(), [...allowed].sort());
-  assert.equal(report.homepageByteIdentical, true);
-  assert.match(report.bundleDigestSha256, /^[a-f0-9]{64}$/);
-  assert.ok(report.missingPublicAssets.includes('og-image.png'));
-  assert.ok(!report.files.some((f) => f.path === 'resources/pilot-manifest.json'));
-  assert.ok(!report.files.some((f) => f.path === 'netlify.toml' || f.path === 'README.md'));
-  const copiedHome = fs.readFileSync(path.join(out, 'index.html'));
-  const sourceHome = fs.readFileSync(path.join(ROOT, 'index.html'));
-  assert.deepEqual(copiedHome, sourceHome);
-  const second = spawnSync(process.execPath, [path.join(ROOT, 'scripts/build-organic-publication.cjs'), out], { encoding: 'utf8' });
-  assert.equal(second.status, 1);
-  assert.match(second.stderr, /Refusing to overwrite/);
-  fs.rmSync(tmp, { recursive: true, force: true });
+  assert.equal(existing.stdout.trim(), '');
 });
 
-test('scope stays at ten new files and existing sources are untouched in git', () => {
-  const { spawnSync } = require('node:child_process');
-  const added = [
-    'resources/index.html',
-    'resources/app-cost-calculator/index.html',
-    'resources/app-cost-calculator/cost-engine.js',
-    'resources/ai-app-running-costs/index.html',
-    'resources/app-portability-checklist/index.html',
-    'resources/editorial-policy/index.html',
-    'resources/sitemap.xml',
-    'resources/pilot-manifest.json',
-    'tests/organic-utility-pilot.test.cjs',
-    'scripts/build-organic-publication.cjs'
-  ];
-  assert.equal(added.length, 10);
-  for (const rel of added) assert.equal(fs.existsSync(path.join(ROOT, rel)), true, rel);
-  const extra = [];
-  function walk(dir) {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const rel = path.relative(ROOT, path.join(dir, entry.name)).split(path.sep).join('/');
-      if (entry.isDirectory()) {
-        if (entry.name === '.git') continue;
-        walk(path.join(dir, entry.name));
-      } else if (!['index.html', 'netlify.toml', 'README.md', 'BASELINE.md', 'release-evidence/index.html', 'tests/release-evidence-check.test.cjs'].includes(rel) && !added.includes(rel)) {
-        extra.push(rel);
-      }
-    }
+test('current required public routes exist as regular files without freezing later additions', () => {
+  for (const rel of REQUIRED_PUBLIC_ROUTES) {
+    const st = fs.lstatSync(path.join(ROOT, rel));
+    assert.equal(st.isSymbolicLink(), false, rel + ' must not be a symlink');
+    assert.equal(st.isFile(), true, rel);
   }
-  walk(ROOT);
-  assert.deepEqual(extra, []);
-  const changedExisting = spawnSync('git', ['diff', '--name-only', '5e9b5a849d729ba322a9fba9fff4470cc8e3212f', '--', 'index.html', 'netlify.toml', 'release-evidence/index.html', 'tests/release-evidence-check.test.cjs', 'README.md', 'BASELINE.md'], { cwd: ROOT, encoding: 'utf8' });
-  assert.equal(changedExisting.stdout.trim(), '');
+  assert.equal(fs.existsSync(path.join(ROOT, 'scripts/build-organic-publication.cjs')), true);
+  const existing = gitMustRun([
+    'diff',
+    '--name-only',
+    PR4_PARENT + '..' + PR4_SHA,
+    '--',
+    'index.html',
+    'netlify.toml',
+    'release-evidence/index.html',
+    'tests/release-evidence-check.test.cjs',
+    'README.md',
+    'BASELINE.md'
+  ]);
+  assert.equal(existing.stdout.trim(), '');
+});
+
+test('publication builder fail-closed invariants on the current tree', () => {
+  const script = path.join(ROOT, 'scripts/build-organic-publication.cjs');
+  const homepage = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const referencedMissing = HOMEPAGE_ASSET_CANDIDATES.filter((name) => {
+    if (!homepageReferencesAllowedAsset(homepage, name)) return false;
+    try {
+      const st = fs.lstatSync(path.join(ROOT, name));
+      return st.isSymbolicLink() || !st.isFile();
+    } catch (err) {
+      return true;
+    }
+  });
+
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'organic-cur-'));
+  const existing = path.join(tmp, 'already');
+  fs.mkdirSync(existing);
+  const marker = Buffer.from('DO-NOT-TOUCH-CURRENT-TREE');
+  fs.writeFileSync(path.join(existing, 'marker.bin'), marker);
+  const overwrite = spawnSync(process.execPath, [script, existing], { encoding: 'utf8' });
+  assert.equal(overwrite.status, 1);
+  assert.match(overwrite.stderr, /Refusing to overwrite/);
+  assert.deepEqual(fs.readFileSync(path.join(existing, 'marker.bin')), marker);
+
+  const out = path.join(tmp, 'bundle');
+  const built = spawnSync(process.execPath, [script, out], { encoding: 'utf8' });
+  if (referencedMissing.length > 0) {
+    assert.notEqual(built.status, 0, 'missing referenced local assets must fail closed: ' + referencedMissing.join(','));
+    assert.equal(fs.existsSync(out), false);
+    assert.doesNotMatch(built.stdout, /"kind": "ORGANIC_PUBLICATION_BUNDLE_REPORT"/);
+    const fail = JSON.parse(built.stdout);
+    assert.equal(fail.kind, 'ORGANIC_PUBLICATION_BUNDLE_FAILURE');
+    assert.equal(fail.publicationReady, false);
+    assert.equal(fail.bundleComplete, false);
+    assert.equal(fail.deployed, false);
+    for (const name of referencedMissing) {
+      assert.ok(fail.missingPublicAssets.includes(name), name);
+    }
+  } else {
+    assert.equal(built.status, 0, built.stderr);
+    const report = JSON.parse(built.stdout);
+    assert.equal(report.kind, 'ORGANIC_PUBLICATION_BUNDLE_REPORT');
+    assert.equal(report.deployed, false);
+    assert.equal(report.hostConfigurationValidated, false);
+    assert.equal(report.homepageByteIdentical, true);
+    assert.ok(!report.files.some((f) => f.path === 'resources/pilot-manifest.json'));
+    assert.ok(!report.files.some((f) => f.path === 'netlify.toml' || f.path === 'README.md'));
+    assert.deepEqual(fs.readFileSync(path.join(out, 'index.html')), fs.readFileSync(path.join(ROOT, 'index.html')));
+  }
+  fs.rmSync(tmp, { recursive: true, force: true });
 });
 
 function startStaticServer() {

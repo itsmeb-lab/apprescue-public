@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI app running-cost calculator — AppRescue</title>
+<meta name="description" content="Free browser-only planner for AI-built app running costs. Enter builder, hosting, database, email, annual, and usage figures. Blank fields stay unknown. USD. No signup or storage.">
+<link rel="canonical" href="https://apprescue.ai/resources/app-cost-calculator/">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="index,follow">
+<style>
+:root{color-scheme:dark;--bg:#0b1017;--panel:#141d29;--line:#2c394b;--text:#edf3fa;--muted:#b3c2d3;--accent:#78ead7;--warning:#ffd398;--bad:#ffaaaa}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden;overflow-wrap:anywhere}a{color:var(--accent)}a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:4px}header,main,footer{width:min(1100px,calc(100% - 32px));margin:auto}header{padding:20px 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:16px;flex-wrap:wrap}header a{text-decoration:none}nav{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}.brand{font-weight:800;font-size:20px;color:var(--text)}.brand span{color:var(--accent)}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:750}.hero{padding:40px 0 12px;max-width:840px}h1{font-size:clamp(30px,6vw,48px);line-height:1.12;letter-spacing:-.03em;margin:12px 0 16px}h2{font-size:24px;margin:0 0 12px}h3{font-size:18px;margin:0 0 8px}p{margin:0 0 14px}.lead{font-size:18px;color:var(--muted);max-width:760px}.fine{font-size:13px;color:var(--muted)}.notice{padding:14px 18px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;color:var(--muted);margin:18px 0}.warning{border-left-color:var(--warning)}.actions{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}.button,button{display:inline-block;font:inherit;font-weight:700;line-height:1.4;border:1px solid var(--line);border-radius:8px;padding:12px 18px;background:var(--accent);color:#0b1017;cursor:pointer;text-decoration:none;min-height:44px}.secondary{background:transparent;color:var(--text)}button:disabled{opacity:.45;cursor:not-allowed}.section{padding:28px 0;border-top:1px solid var(--line)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;min-width:0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.field label{display:block;font-weight:650;margin-bottom:6px}input{width:100%;max-width:100%;font:inherit;background:var(--bg);color:var(--text);border:1px solid #55647a;border-radius:7px;padding:10px;min-height:44px}input[aria-invalid="true"]{border-color:var(--bad)}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}.metric{padding:14px;border:1px solid var(--line);border-radius:10px;min-width:0}.metric strong{display:block;font-size:26px;line-height:1.2}.metric span{color:var(--muted);font-size:13px}.skip{position:absolute;left:8px;top:-60px;background:var(--text);color:var(--bg);padding:12px;z-index:10}.skip:focus{top:8px}footer{padding:28px 0;color:var(--muted);font-size:13px}.status{min-height:24px;color:var(--accent)}[hidden]{display:none!important}ol,ul{padding-left:22px}li{margin-bottom:6px}@media(max-width:720px){header{align-items:flex-start}.grid,.metrics{grid-template-columns:1fr}.metric strong{font-size:22px}.hero{padding-top:24px}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+  <a class="brand" href="https://apprescue.ai/">App<span>Rescue</span></a>
+  <nav aria-label="Resources">
+    <a href="/resources/">Hub</a>
+    <a href="/resources/app-cost-calculator/">Calculator</a>
+    <a href="/resources/ai-app-running-costs/">Running costs</a>
+    <a href="/resources/app-portability-checklist/">Portability</a>
+    <a href="/resources/editorial-policy/">Editorial policy</a>
+    <a href="/release-evidence/">Release evidence</a>
+  </nav>
+</header>
+<main id="main">
+  <section class="hero">
+    <p class="eyebrow">Free · browser only · USD</p>
+    <h1>Plan running cost from your numbers.</h1>
+    <p class="lead">Estimate monthly cash and first-year cash for an AI-built app. Builder subscription and deployed-app operation are separate lines even when they share a credit wallet. Nothing is uploaded, stored, or sent to a model.</p>
+    <div class="notice"><strong>This is a budget, not a quote.</strong> Results explain a formula over values you type. They do not rank vendors, include tax, labor, refunds, or payment fees, or guarantee a spend cap. Read <a href="/resources/ai-app-running-costs/">why builder cost and running cost split</a>.</div>
+  </section>
+
+  <section class="section" id="planner" aria-labelledby="planner-title">
+    <h2 id="planner-title">Your figures</h2>
+    <p class="fine">Leave a field blank if you do not know it. Blank stays unknown and keeps totals incomplete. Type 0 when the line is truly zero. Money accepts up to two decimal places. Units and multipliers accept up to three.</p>
+    <form id="cost-form" novalidate>
+      <div class="panel grid">
+        <div class="field"><label for="builderMonthly">Builder subscription (USD / month)</label><input id="builderMonthly" name="builderMonthly" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Leave blank if unknown"><span class="fine" id="hint-builderMonthly">Editor / agent plan, not hosting.</span></div>
+        <div class="field"><label for="hostingMonthly">Hosting (USD / month)</label><input id="hostingMonthly" name="hostingMonthly" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Leave blank if unknown"></div>
+        <div class="field"><label for="databaseMonthly">Database (USD / month)</label><input id="databaseMonthly" name="databaseMonthly" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Leave blank if unknown"></div>
+        <div class="field"><label for="emailOtherMonthly">Email and other fixed (USD / month)</label><input id="emailOtherMonthly" name="emailOtherMonthly" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Leave blank if unknown"></div>
+        <div class="field"><label for="annualCosts">Annual costs (USD / year)</label><input id="annualCosts" name="annualCosts" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Leave blank if unknown"><span class="fine">Amortized monthly as floor(annual ÷ 12). First-year cash uses the full amount.</span></div>
+        <div class="field"><label for="oneTimeSetup">One-time setup (USD)</label><input id="oneTimeSetup" name="oneTimeSetup" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Leave blank if unknown"><span class="fine">Counted in first-year cash only.</span></div>
+        <div class="field"><label for="usageUnits">Monthly usage units</label><input id="usageUnits" name="usageUnits" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Leave blank if unknown"><span class="fine">Your unit: credits, GiB, requests — you define it.</span></div>
+        <div class="field"><label for="pricePerUnit">Price per usage unit (USD)</label><input id="pricePerUnit" name="pricePerUnit" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Leave blank if unknown"></div>
+        <div class="field"><label for="includedAllowance">Included allowance (same units)</label><input id="includedAllowance" name="includedAllowance" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Leave blank if unknown"><span class="fine">Subtracted from usage once. Not a second dollar discount.</span></div>
+        <div class="field"><label for="lowMultiplier">Low usage multiplier</label><input id="lowMultiplier" name="lowMultiplier" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Leave blank if unknown"></div>
+        <div class="field"><label for="baseMultiplier">Base usage multiplier</label><input id="baseMultiplier" name="baseMultiplier" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Leave blank if unknown"></div>
+        <div class="field"><label for="highMultiplier">High usage multiplier</label><input id="highMultiplier" name="highMultiplier" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Leave blank if unknown"></div>
+      </div>
+      <div class="actions">
+        <button type="submit" id="calculate">Calculate budget</button>
+        <button type="button" id="clear-inputs" class="secondary">Reset fields</button>
+        <button type="button" id="example-a" class="secondary">Load hypothetical example A</button>
+        <button type="button" id="example-b" class="secondary">Load hypothetical example B</button>
+      </div>
+      <p class="fine">Examples A and B are plainly hypothetical planning scenarios. They are not vendor prices, quotes, or recommendations.</p>
+      <noscript><div class="notice warning">JavaScript is required for local calculation. Nothing is uploaded. You can still read the formula and the <a href="/resources/ai-app-running-costs/">running-cost guide</a>.</div></noscript>
+    </form>
+  </section>
+
+  <section class="section" id="results" aria-labelledby="result-title" hidden>
+    <div class="panel">
+      <p class="eyebrow">Planning budget · not a vendor quote</p>
+      <h2 id="result-title" tabindex="-1">Monthly and first-year cash</h2>
+      <p id="result-subtitle"></p>
+      <div class="metrics">
+        <div class="metric"><span>Low monthly</span><strong id="out-monthly-low">—</strong></div>
+        <div class="metric"><span>Base monthly</span><strong id="out-monthly-base">—</strong></div>
+        <div class="metric"><span>High monthly</span><strong id="out-monthly-high">—</strong></div>
+        <div class="metric"><span>Low first year</span><strong id="out-year-low">—</strong></div>
+        <div class="metric"><span>Base first year</span><strong id="out-year-base">—</strong></div>
+        <div class="metric"><span>High first year</span><strong id="out-year-high">—</strong></div>
+      </div>
+      <h3>Line items (base, your inputs)</h3>
+      <ul id="breakdown"></ul>
+      <h3>Formula</h3>
+      <ol id="formula"></ol>
+      <h3>Assumptions and exclusions</h3>
+      <ul id="notes"></ul>
+      <div class="actions">
+        <button type="button" id="download-json">Download JSON</button>
+      </div>
+      <p id="export-status" class="status" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Hypothetical examples</h2>
+    <p>These are invented planning numbers for the buttons above. They are not taken from a vendor price page.</p>
+    <div class="grid">
+      <div class="panel">
+        <h3>Example A — small internal tool</h3>
+        <p class="fine">Builder $20, hosting $12, database $7.50, email $4.25, annual $120, setup $50, 100 usage units at $0.10 with 20 included, multipliers 0.5 / 1 / 2.</p>
+      </div>
+      <div class="panel">
+        <h3>Example B — public beta with heavier usage</h3>
+        <p class="fine">Builder $50, hosting $20, database $15, email $10, annual $240, setup $150, 5,000 units at $0.02 with 1,000 included, multipliers 0.4 / 1 / 2.5.</p>
+      </div>
+    </div>
+    <p class="fine">Related: <a href="/resources/app-portability-checklist/">portability checklist</a> · <a href="/release-evidence/">release evidence</a> · <a href="/resources/editorial-policy/">editorial policy</a>. <a href="https://apprescue.ai/#beta">AppRescue beta consideration</a> is our own service, not a certification.</p>
+  </section>
+</main>
+<footer>
+  <p>Reviewed 13 September 2026. Currency USD only. Affiliate links enabled: false.</p>
+</footer>
+<script src="cost-engine.js"></script>
+<script id="cost-ui">
+(function () {
+  'use strict';
+  var C = globalThis.AppCostCalculator;
+  var byId = function (id) { return document.getElementById(id); };
+  var fields = C.ALL_FIELDS;
+  var current = null;
+  var examples = {
+    a: { builderMonthly: '20.00', hostingMonthly: '12.00', databaseMonthly: '7.50', emailOtherMonthly: '4.25', annualCosts: '120.00', oneTimeSetup: '50.00', usageUnits: '100', pricePerUnit: '0.10', includedAllowance: '20', lowMultiplier: '0.5', baseMultiplier: '1', highMultiplier: '2' },
+    b: { builderMonthly: '50.00', hostingMonthly: '20.00', databaseMonthly: '15.00', emailOtherMonthly: '10.00', annualCosts: '240.00', oneTimeSetup: '150.00', usageUnits: '5000', pricePerUnit: '0.02', includedAllowance: '1000', lowMultiplier: '0.4', baseMultiplier: '1', highMultiplier: '2.5' }
+  };
+
+  function collect() {
+    var input = {};
+    for (var i = 0; i < fields.length; i += 1) input[fields[i]] = byId(fields[i]).value;
+    return input;
+  }
+
+  function invalidate() {
+    current = null;
+    byId('results').hidden = true;
+    byId('export-status').textContent = '';
+  }
+
+  function markValidity(report) {
+    for (var i = 0; i < fields.length; i += 1) {
+      var parsed = report.fields[fields[i]];
+      byId(fields[i]).setAttribute('aria-invalid', parsed.status === 'error' ? 'true' : 'false');
+    }
+  }
+
+  function setText(id, value) {
+    byId(id).textContent = value;
+  }
+
+  function fillList(node, items) {
+    node.replaceChildren();
+    for (var i = 0; i < items.length; i += 1) {
+      var li = document.createElement('li');
+      li.textContent = items[i];
+      node.append(li);
+    }
+  }
+
+  function lineLabel(key, line) {
+    return key + ': ' + line.display + (line.status === 'ok' ? '' : ' (' + (line.reason || line.status) + ')');
+  }
+
+  function render() {
+    var input = collect();
+    var report = C.evaluate(input);
+    current = { input: input, report: report };
+    markValidity(report);
+    setText('out-monthly-low', report.scenarios.low.monthly.display);
+    setText('out-monthly-base', report.scenarios.base.monthly.display);
+    setText('out-monthly-high', report.scenarios.high.monthly.display);
+    setText('out-year-low', report.scenarios.low.firstYear.display);
+    setText('out-year-base', report.scenarios.base.firstYear.display);
+    setText('out-year-high', report.scenarios.high.firstYear.display);
+    var complete = report.complete.monthlyBase && report.complete.firstYearBase;
+    byId('result-subtitle').textContent = complete
+      ? 'Base scenario is complete. Low and high scale usage units only. This remains a budget, not a quote.'
+      : 'One or more required fields are unknown or invalid, so some totals stay incomplete. Explicit zeros are allowed; blanks are not zeros.';
+    var lines = report.lines;
+    fillList(byId('breakdown'), [
+      lineLabel('Builder', lines.builderMonthly),
+      lineLabel('Hosting', lines.hostingMonthly),
+      lineLabel('Database', lines.databaseMonthly),
+      lineLabel('Email / other', lines.emailOtherMonthly),
+      lineLabel('Annual amortized into monthly', lines.annualAmortized),
+      lineLabel('Annual (full, used in first year)', lines.annualCosts),
+      lineLabel('Variable usage (base)', report.scenarios.base.variable),
+      lineLabel('One-time setup', lines.oneTimeSetup)
+    ]);
+    fillList(byId('formula'), report.formula);
+    fillList(byId('notes'), report.assumptions.concat(report.limitations));
+    byId('results').hidden = false;
+    byId('export-status').textContent = '';
+    byId('result-title').focus();
+  }
+
+  function applyExample(key) {
+    var sample = examples[key];
+    for (var i = 0; i < fields.length; i += 1) byId(fields[i]).value = sample[fields[i]];
+    invalidate();
+    render();
+  }
+
+  byId('cost-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+    render();
+  });
+  byId('cost-form').addEventListener('input', invalidate);
+  byId('cost-form').addEventListener('change', invalidate);
+  byId('clear-inputs').addEventListener('click', function () {
+    byId('cost-form').reset();
+    for (var i = 0; i < fields.length; i += 1) byId(fields[i]).setAttribute('aria-invalid', 'false');
+    invalidate();
+    byId('builderMonthly').focus();
+  });
+  byId('example-a').addEventListener('click', function () { applyExample('a'); });
+  byId('example-b').addEventListener('click', function () { applyExample('b'); });
+  byId('download-json').addEventListener('click', function () {
+    if (!current) return;
+    var payload = C.exportPayload(current.report, current.input);
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'app-running-cost-budget.json';
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    byId('export-status').textContent = 'JSON prepared on this device. Review it before sharing. It contains the numbers you typed.';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Why Preview Works but Production Differs — AppRescue</title>
+<meta name="description" content="A practical map of why AI-built apps look fine in preview but break in production—env scopes, build-time freezes, auth callbacks—plus a Diff Worksheet.">
+<link rel="canonical" href="https://apprescue.ai/guides/preview-works-production-differs/">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="index,follow">
+<style>
+:root{color-scheme:dark;--bg:#0b1017;--panel:#141d29;--line:#2c394b;--text:#edf3fa;--muted:#b3c2d3;--accent:#78ead7;--warning:#ffd398}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden;overflow-wrap:anywhere}a{color:var(--accent)}a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:4px}header,main,footer{width:min(860px,calc(100% - 32px));margin:auto}header{padding:20px 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:16px;flex-wrap:wrap}header a{text-decoration:none}nav{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}.brand{font-weight:800;font-size:20px;color:var(--text)}.brand span{color:var(--accent)}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:750}.hero{padding:40px 0 12px}h1{font-size:clamp(28px,6vw,46px);line-height:1.15;letter-spacing:-.03em;margin:12px 0 16px}h2{font-size:22px;margin:28px 0 10px}h3{font-size:18px;margin:20px 0 8px}p,li{margin:0 0 12px}ul,ol{padding-left:22px}.lead,.fine{color:var(--muted)}.fine{font-size:13px}.notice{padding:14px 18px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;color:var(--muted);margin:18px 0}.cite{font-size:13px;color:var(--muted)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:12px 0;min-width:0}.map h3{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}.map p{margin:0 0 12px}.check{display:flex;gap:10px;align-items:flex-start;font-weight:650;margin:0 0 10px}.check input{margin-top:5px;flex:0 0 auto;accent-color:var(--accent);width:18px;height:18px}.field{margin:10px 0 0}.field label,.field .lbl{display:block;font-weight:650;margin-bottom:6px}input[type=text],textarea{width:100%;font:inherit;background:var(--bg);color:var(--text);border:1px solid #55647a;border-radius:7px;padding:10px;min-height:44px}textarea{min-height:88px;resize:vertical}.choices{display:flex;flex-wrap:wrap;gap:8px 14px;margin:8px 0}.choices label{display:flex;gap:6px;align-items:center}.skip{position:absolute;left:8px;top:-60px;background:var(--text);color:var(--bg);padding:12px;z-index:10}.skip:focus{top:8px}footer{padding:28px 0;color:var(--muted);font-size:13px}@media(max-width:720px){header{align-items:flex-start}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+  <a class="brand" href="https://apprescue.ai/">App<span>Rescue</span></a>
+  <nav aria-label="Guides">
+    <a href="/guides/assess-repair-or-rebuild/">Assess</a>
+    <a href="/guides/preview-works-production-differs/" aria-current="page">Preview vs production</a>
+    <a href="/guides/what-a-passing-build-does-not-prove/">Passing builds</a>
+    <a href="/resources/">Resources</a>
+    <a href="/release-evidence/">Release evidence</a>
+  </nav>
+</header>
+<main id="main">
+  <section class="hero">
+    <p class="eyebrow">Guide · documents, not a live deploy audit</p>
+    <h1>Why Preview Works but Production Differs</h1>
+    <p class="lead">The app looked fine on localhost or a preview URL. Production—or “real users”—behaves differently: auth redirects, empty data, missing keys, wrong API hosts. You need a parity worksheet, not a panic rebuild.</p>
+    <p class="fine">Author: AppRescue. Reviewed 13 September 2026. Technical claims about environment scopes, redeploy behavior, and <code>NEXT_PUBLIC_</code> inlining are tied to the vendor docs listed below.</p>
+  </section>
+
+  <div class="notice"><strong>Preview success is not production proof.</strong> Keep sensitive logs and screenshots in a private place you control. The <a href="/release-evidence/">Release Evidence Check</a> is browser-local and self-report only. It does not accept uploads. Record non-sensitive evidence labels and status there. Never paste secrets.</div>
+
+  <section id="direct-answer">
+    <h2>Direct answer</h2>
+    <p>Hosting platforms intentionally give Preview, Production, and Development different configuration scopes. Client-visible values can be <strong>frozen at build time</strong>. Adding or changing environment variables typically applies to <strong>new deployments only</strong>, not the deployment you are already staring at.</p>
+    <p>Before you rewrite, walk the Diff Worksheet below: environment parity → auth and callback URLs → data differences → build and runtime flags → network and host differences → still unexplained. Unexplained leftovers belong in a private evidence pack you keep, with non-sensitive labels recorded in the <a href="/release-evidence/">Release Evidence Check</a>, or in a bounded structural inquiry—not in a sales-call rebuild.</p>
+  </section>
+
+  <h2>Why preview and production diverge</h2>
+  <h3>1. Different environment scopes</h3>
+  <p>On Vercel, environment variables can be scoped separately to <strong>Production</strong>, <strong>Preview</strong>, and <strong>Development</strong> (plus custom environments on some plans). Production applies to production-branch / production deployments; Preview applies to non-production branch deployments; Development is for local workflows such as <code>vercel env pull</code> / local run. See Vercel’s <a href="https://vercel.com/docs/projects/environment-variables" rel="noopener noreferrer">environment variables</a> docs and the <a href="https://vercel.com/docs/deployments/environments" rel="noopener noreferrer">deployments / environments</a> overview.</p>
+  <p><strong>Practical meaning:</strong> A key present in Preview can be missing, different, or intentionally weaker in Production—or the reverse. “It worked on the preview URL” often means “it worked with Preview-scoped values.”</p>
+
+  <h3>2. Changes apply to new deployments only</h3>
+  <p>Vercel documents that changes to environment variables are <strong>not</strong> applied to previous deployments; they apply to <strong>new</strong> deployments. After adding variables, you need a redeploy for the running path to pick them up. Primary sources: <a href="https://vercel.com/docs/projects/environment-variables" rel="noopener noreferrer">Environment variables</a> (“Any change you make to environment variables are not applied to previous deployments, they only apply to new deployments”) and <a href="https://vercel.com/kb/guide/how-to-add-vercel-environment-variables" rel="noopener noreferrer">How to add Vercel environment variables</a> (redeploy after adding vars; existing deployments keep prior values).</p>
+  <p><strong>Practical meaning:</strong> Dashboard edits without a new deployment are a common false “still broken” signal.</p>
+
+  <h3>3. Build-time freeze for <code>NEXT_PUBLIC_</code> values</h3>
+  <p>Next.js documents that variables prefixed with <code>NEXT_PUBLIC_</code> are <strong>inlined at build time</strong> into the client bundle. After the build, the app does not magically pick up later runtime changes to those values; they are frozen with what was present when <code>next build</code> ran. Source: <a href="https://nextjs.org/docs/pages/guides/environment-variables" rel="noopener noreferrer">Next.js — Environment Variables</a> (bundling for the browser; freeze after build).</p>
+  <p><strong>Practical meaning:</strong> Fixing a public client config often requires a <strong>rebuild</strong>, not only a runtime env tweak. Promoting an artifact built in one environment into another can carry the wrong inlined values.</p>
+
+  <h3>4. Auth callbacks, data, and hosts</h3>
+  <p>Even with matching code:</p>
+  <ul>
+    <li>OAuth / magic-link <strong>callback URLs</strong> often allowlist only certain hosts (localhost is not a preview domain, and neither is production).</li>
+    <li>Preview databases are frequently empty or seeded; production has real rows, constraints, and worse edge cases.</li>
+    <li>CORS, cookie domains, and absolute URL helpers can diverge by host.</li>
+    <li>Feature flags and “demo mode” shortcuts may be on in Preview and off (or missing) in Production.</li>
+  </ul>
+  <p>None of these require a mysterious framework bug. They require a parity check.</p>
+
+  <h2>Symptom → first check</h2>
+  <article class="panel map">
+    <h3>What you see</h3>
+    <p>Works locally / preview; production 500s or missing config</p>
+    <h3>Likely first check</h3>
+    <p>Are Production-scoped vars present and redeployed?</p>
+    <p class="fine">Self-tag: likely env. Tags are hypotheses, not a pass/fail certification.</p>
+  </article>
+  <article class="panel map">
+    <h3>What you see</h3>
+    <p>Login redirect loops only in production</p>
+    <h3>Likely first check</h3>
+    <p>Callback / redirect allowlists per host</p>
+    <p class="fine">Self-tag: likely env.</p>
+  </article>
+  <article class="panel map">
+    <h3>What you see</h3>
+    <p>Client sees an old public API URL</p>
+    <h3>Likely first check</h3>
+    <p>Was <code>NEXT_PUBLIC_*</code> set at <strong>build</strong> time for that deployment?</p>
+    <p class="fine">Self-tag: likely env / build freeze.</p>
+  </article>
+  <article class="panel map">
+    <h3>What you see</h3>
+    <p>Preview has data; production empty (or the opposite)</p>
+    <h3>Likely first check</h3>
+    <p>Which database or seed does each environment use?</p>
+    <p class="fine">Self-tag: likely data.</p>
+  </article>
+  <article class="panel map">
+    <h3>What you see</h3>
+    <p>Same code, different CORS / cookie behavior</p>
+    <h3>Likely first check</h3>
+    <p>Host, scheme, and cookie domain differences</p>
+    <p class="fine">Self-tag: likely network/host.</p>
+  </article>
+  <article class="panel map">
+    <h3>What you see</h3>
+    <p>Still unexplained after a parity pass</p>
+    <h3>Likely first check</h3>
+    <p>Retain private artifacts. Record non-sensitive labels. Do not invent a rewrite.</p>
+    <p class="fine">Self-tag: need evidence.</p>
+  </article>
+
+  <h2>What still needs observed evidence</h2>
+  <p>A green preview does not buy you:</p>
+  <ul>
+    <li>Proof that production auth boundaries hold for real users</li>
+    <li>Proof of restore / release ownership</li>
+    <li>Proof that secrets are handled correctly in the live path</li>
+    <li>Proof that critical workflows were observed under production configuration</li>
+  </ul>
+  <p>When you need a structured acceptance pack, use the <a href="/release-evidence/">Release Evidence Check</a>. This guide does not replace that checklist. For why “CI green” is also not enough, see <a href="/guides/what-a-passing-build-does-not-prove/">What a passing build does not prove</a>. For whether unexplained gaps argue assess versus rewrite, see <a href="/guides/assess-repair-or-rebuild/">Assess, repair, or rebuild</a>. Cost questions belong in the <a href="/resources/app-cost-calculator/">running-cost calculator</a>, not in a panic rebuild.</p>
+
+  <h2>When a bounded AppAssessment helps</h2>
+  <p>If parity checks leave structural unknowns (unclear module boundaries, unknown ownership of environments or secrets, no journey map), a <strong>bounded structural diagnostic</strong> can record observed structure, list evidence gaps, and recommend next checks.</p>
+  <p><strong>AppAssessment is not</strong> automated, a security certification, a penetration test, verified correctness, production approval, guaranteed repair, or autonomous bug repair. A later <a href="/#beta">fit inquiry</a> is not an accepted order.</p>
+
+  <h2 id="worksheet">Preview ≠ production diff worksheet</h2>
+  <p>Purpose: a self-serve parity pass before rewrite talk. No backend score. For each row, mark Unknown / Likely env / Likely code / Likely data / Likely network. Prefer collecting private artifacts over guessing. Do not paste secret values.</p>
+
+  <h3>A) Environment parity</h3>
+  <div class="panel">
+    <p><strong>Required secret or config keys exist</strong> (names only)</p>
+    <p class="fine">Preview</p>
+    <div class="choices">
+      <label><input type="radio" name="env-prev-keys" value="y"> Yes</label>
+      <label><input type="radio" name="env-prev-keys" value="n"> No</label>
+      <label><input type="radio" name="env-prev-keys" value="u"> Unknown</label>
+    </div>
+    <p class="fine">Production</p>
+    <div class="choices">
+      <label><input type="radio" name="env-prod-keys" value="y"> Yes</label>
+      <label><input type="radio" name="env-prod-keys" value="n"> No</label>
+      <label><input type="radio" name="env-prod-keys" value="u"> Unknown</label>
+    </div>
+    <p class="fine">Match?</p>
+    <div class="choices">
+      <label><input type="radio" name="env-keys-match" value="y"> Yes</label>
+      <label><input type="radio" name="env-keys-match" value="n"> No</label>
+      <label><input type="radio" name="env-keys-match" value="u"> Unknown</label>
+    </div>
+    <div class="field"><label for="env-diff-why">Values intentionally different? Document why (no secret values)</label><input id="env-diff-why" type="text" autocomplete="off"></div>
+    <p><strong>Vars changed since last successful deploy?</strong></p>
+    <p class="fine">Preview</p>
+    <div class="choices">
+      <label><input type="radio" name="env-prev-changed" value="y"> Yes</label>
+      <label><input type="radio" name="env-prev-changed" value="n"> No</label>
+      <label><input type="radio" name="env-prev-changed" value="u"> Unknown</label>
+    </div>
+    <p class="fine">Production</p>
+    <div class="choices">
+      <label><input type="radio" name="env-prod-changed" value="y"> Yes</label>
+      <label><input type="radio" name="env-prod-changed" value="n"> No</label>
+      <label><input type="radio" name="env-prod-changed" value="u"> Unknown</label>
+    </div>
+    <p><strong>Redeploy performed after env change?</strong> (<a href="https://vercel.com/kb/guide/how-to-add-vercel-environment-variables" rel="noopener noreferrer">Vercel KB</a>)</p>
+    <p class="fine">Preview</p>
+    <div class="choices">
+      <label><input type="radio" name="env-prev-redeploy" value="y"> Yes</label>
+      <label><input type="radio" name="env-prev-redeploy" value="n"> No</label>
+      <label><input type="radio" name="env-prev-redeploy" value="u"> Unknown</label>
+    </div>
+    <p class="fine">Production</p>
+    <div class="choices">
+      <label><input type="radio" name="env-prod-redeploy" value="y"> Yes</label>
+      <label><input type="radio" name="env-prod-redeploy" value="n"> No</label>
+      <label><input type="radio" name="env-prod-redeploy" value="u"> Unknown</label>
+    </div>
+    <p><strong><code>NEXT_PUBLIC_*</code> values match the build that is live?</strong> (<a href="https://nextjs.org/docs/pages/guides/environment-variables" rel="noopener noreferrer">Next.js docs</a>)</p>
+    <p class="fine">Preview</p>
+    <div class="choices">
+      <label><input type="radio" name="env-prev-public" value="y"> Yes</label>
+      <label><input type="radio" name="env-prev-public" value="n"> No</label>
+      <label><input type="radio" name="env-prev-public" value="u"> Unknown</label>
+    </div>
+    <p class="fine">Production</p>
+    <div class="choices">
+      <label><input type="radio" name="env-prod-public" value="y"> Yes</label>
+      <label><input type="radio" name="env-prod-public" value="n"> No</label>
+      <label><input type="radio" name="env-prod-public" value="u"> Unknown</label>
+    </div>
+    <div class="field"><label for="env-tag">Self-tag for this section</label><input id="env-tag" type="text" autocomplete="off" placeholder="Unknown / Likely env / Likely code / Likely data / Likely network"></div>
+    <p class="fine">Scopes: <a href="https://vercel.com/docs/projects/environment-variables" rel="noopener noreferrer">Vercel env vars</a> · <a href="https://vercel.com/docs/deployments/environments" rel="noopener noreferrer">Environments</a>.</p>
+  </div>
+
+  <h3>B) Auth / callback URLs per environment</h3>
+  <div class="panel">
+    <div class="field"><label for="auth-prev">Allowed redirect / callback hosts listed for Preview</label><input id="auth-prev" type="text" autocomplete="off"></div>
+    <div class="field"><label for="auth-prod">Allowed redirect / callback hosts listed for Production</label><input id="auth-prod" type="text" autocomplete="off"></div>
+    <div class="field"><label for="auth-cookie">Cookie domain / SameSite assumptions (no secret cookie values)</label><input id="auth-cookie" type="text" autocomplete="off"></div>
+    <p><strong>Magic-link / OAuth provider “prod vs dev” apps separated?</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="auth-apps" value="y"> Yes</label>
+      <label><input type="radio" name="auth-apps" value="n"> No</label>
+      <label><input type="radio" name="auth-apps" value="u"> Unknown</label>
+    </div>
+    <div class="field"><label for="auth-tag">Self-tag</label><input id="auth-tag" type="text" autocomplete="off"></div>
+  </div>
+
+  <h3>C) Data: empty vs seeded vs production</h3>
+  <div class="panel">
+    <div class="field"><label for="data-prev">Which database / project does Preview use? (name only)</label><input id="data-prev" type="text" autocomplete="off"></div>
+    <div class="field"><label for="data-prod">Which database / project does Production use? (name only)</label><input id="data-prod" type="text" autocomplete="off"></div>
+    <div class="field"><label for="data-seed">Seed vs real data differences that affect the bug</label><input id="data-seed" type="text" autocomplete="off"></div>
+    <p><strong>Migrations applied in both?</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="data-mig" value="y"> Yes</label>
+      <label><input type="radio" name="data-mig" value="n"> No</label>
+      <label><input type="radio" name="data-mig" value="u"> Unknown</label>
+    </div>
+    <div class="field"><label for="data-tag">Self-tag</label><input id="data-tag" type="text" autocomplete="off"></div>
+  </div>
+
+  <h3>D) Build / runtime flags</h3>
+  <div class="panel">
+    <div class="field"><label for="flag-feat">Feature flags differ by environment?</label><input id="flag-feat" type="text" autocomplete="off"></div>
+    <div class="field"><label for="flag-demo">“Demo mode” / bypasses present in Preview only?</label><input id="flag-demo" type="text" autocomplete="off"></div>
+    <div class="field"><label for="flag-runtime">Edge vs Node runtime differences suspected?</label><input id="flag-runtime" type="text" autocomplete="off"></div>
+    <div class="field"><label for="flag-tag">Self-tag</label><input id="flag-tag" type="text" autocomplete="off"></div>
+  </div>
+
+  <h3>E) Network / CORS / host</h3>
+  <div class="panel">
+    <div class="field"><label for="net-abs">Absolute URLs / canonical host helpers</label><input id="net-abs" type="text" autocomplete="off"></div>
+    <div class="field"><label for="net-cors">CORS allowlist includes the production origin?</label><input id="net-cors" type="text" autocomplete="off"></div>
+    <div class="field"><label for="net-hook">Third-party webhooks pointed at which URL? (no signing secrets)</label><input id="net-hook" type="text" autocomplete="off"></div>
+    <div class="field"><label for="net-tag">Self-tag</label><input id="net-tag" type="text" autocomplete="off"></div>
+  </div>
+
+  <h3>F) Still unexplained</h3>
+  <div class="panel">
+    <div class="field"><label for="unex-1">Unexplained leftover 1</label><input id="unex-1" type="text" autocomplete="off"></div>
+    <div class="field"><label for="unex-2">Unexplained leftover 2</label><input id="unex-2" type="text" autocomplete="off"></div>
+    <div class="field"><label for="unex-3">Unexplained leftover 3</label><input id="unex-3" type="text" autocomplete="off"></div>
+  </div>
+
+  <h3>Next checks (not a second acceptance checklist)</h3>
+  <ul>
+    <li>Retain sensitive logs, screenshots, and deployment URLs privately. Do not upload or attach them to the <a href="/release-evidence/">Release Evidence Check</a>. That tool is browser-local and self-report only; it does not accept uploads.</li>
+    <li>On the checklist, record non-sensitive evidence labels and status only. Never paste secrets, tokens, customer data, or private links.</li>
+    <li>If structure or ownership is opaque, use assess-first framing in <a href="/guides/assess-repair-or-rebuild/">Assess, repair, or rebuild</a>.</li>
+    <li>If “CI was green” is the comfort blanket, read <a href="/guides/what-a-passing-build-does-not-prove/">What a passing build does not prove</a>.</li>
+    <li>If you are also leaving a builder, the <a href="/resources/app-portability-checklist/">portability checklist</a> covers export ownership separately from preview/production parity.</li>
+  </ul>
+
+  <h2>Explicit limitations</h2>
+  <ul>
+    <li>This guide explains common hosting and framework behaviors using public vendor documentation. It does not diagnose your specific deployment, certify security, verify correctness, approve production readiness, or repair bugs.</li>
+    <li>Completing the Diff Worksheet is self-reported education. Tags such as “Likely env” are hypotheses, not lab results.</li>
+    <li>AppAssessment, if requested later, is only a bounded structural diagnostic (observed structure, evidence gaps, recommended next checks)—not a pen-test, certification, automated scan, or autonomous repair offering.</li>
+    <li>These pages are publication candidates in this public repository. Hosted availability, indexing, traffic, and revenue are not proven here.</li>
+    <li>No affiliate parameters on vendor doc links. No fake case studies, testimonials, rankings, or invented “X% of preview bugs” metrics.</li>
+  </ul>
+
+  <h2>Next step (fit inquiry)</h2>
+  <p>If the worksheet ends in “still unexplained” structural gaps—and you want a bounded read of what is observable versus what still needs checking—submit a <a href="/#beta">fit inquiry</a>. That inquiry is not an accepted repair order, rewrite quote, or production approval. AppRescue beta consideration is our own service.</p>
+
+  <h2>Primary sources</h2>
+  <ul>
+    <li><a href="https://vercel.com/docs/projects/environment-variables" rel="noopener noreferrer">https://vercel.com/docs/projects/environment-variables</a> (Production / Preview / Development scopes; changes apply to new deployments only)</li>
+    <li><a href="https://vercel.com/docs/deployments/environments" rel="noopener noreferrer">https://vercel.com/docs/deployments/environments</a></li>
+    <li><a href="https://nextjs.org/docs/pages/guides/environment-variables" rel="noopener noreferrer">https://nextjs.org/docs/pages/guides/environment-variables</a> (<code>NEXT_PUBLIC_</code> inlined at build; build-time freeze)</li>
+    <li><a href="https://vercel.com/kb/guide/how-to-add-vercel-environment-variables" rel="noopener noreferrer">https://vercel.com/kb/guide/how-to-add-vercel-environment-variables</a> (redeploy after adding vars)</li>
+  </ul>
+
+  <h2>Authorship / methodology</h2>
+  <p>Hand-prepared editorial for AppRescue organic acquisition. Statements about environment scopes, redeploy behavior, and <code>NEXT_PUBLIC_</code> inlining are anchored to the unpaid primary docs listed above. AppAssessment language is locked to a bounded structural diagnostic only. No invented customers, metrics, or testimonials.</p>
+  <p class="fine">Reviewed 13 September 2026. This is a publication candidate, not proof that the page is hosted or indexed. <a href="/resources/editorial-policy/">Editorial policy</a>.</p>
+</main>
+<footer>
+  <p><a href="/#beta">AppRescue beta consideration</a> is our own service, not a certification.</p>
+</footer>
+</body>
+</html>

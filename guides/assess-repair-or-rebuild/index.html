@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Assess, Repair, or Rebuild an AI-Built App? — AppRescue</title>
+<meta name="description" content="Assess, repair, or rebuild an AI-built app: evidence gate, changeability signals, and a fillable worksheet—without rewrite guesswork.">
+<link rel="canonical" href="https://apprescue.ai/guides/assess-repair-or-rebuild/">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="index,follow">
+<style>
+:root{color-scheme:dark;--bg:#0b1017;--panel:#141d29;--line:#2c394b;--text:#edf3fa;--muted:#b3c2d3;--accent:#78ead7;--warning:#ffd398}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden;overflow-wrap:anywhere}a{color:var(--accent)}a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:4px}header,main,footer{width:min(860px,calc(100% - 32px));margin:auto}header{padding:20px 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:16px;flex-wrap:wrap}header a{text-decoration:none}nav{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}.brand{font-weight:800;font-size:20px;color:var(--text)}.brand span{color:var(--accent)}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:750}.hero{padding:40px 0 12px}h1{font-size:clamp(28px,6vw,46px);line-height:1.15;letter-spacing:-.03em;margin:12px 0 16px}h2{font-size:22px;margin:28px 0 10px}h3{font-size:18px;margin:20px 0 8px}p,li{margin:0 0 12px}ul,ol{padding-left:22px}.lead,.fine{color:var(--muted)}.fine{font-size:13px}.notice{padding:14px 18px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;color:var(--muted);margin:18px 0}.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:12px 0;min-width:0}.check{display:flex;gap:10px;align-items:flex-start;font-weight:650;margin:0 0 10px}.check input{margin-top:5px;flex:0 0 auto;accent-color:var(--accent);width:18px;height:18px}.field{margin:10px 0 0}.field label,.field .lbl{display:block;font-weight:650;margin-bottom:6px}input[type=text],textarea{width:100%;font:inherit;background:var(--bg);color:var(--text);border:1px solid #55647a;border-radius:7px;padding:10px;min-height:44px}textarea{min-height:88px;resize:vertical}.choices{display:flex;flex-wrap:wrap;gap:8px 14px;margin:8px 0}.choices label{display:flex;gap:6px;align-items:center}.skip{position:absolute;left:8px;top:-60px;background:var(--text);color:var(--bg);padding:12px;z-index:10}.skip:focus{top:8px}footer{padding:28px 0;color:var(--muted);font-size:13px}@media(max-width:720px){header{align-items:flex-start}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+  <a class="brand" href="https://apprescue.ai/">App<span>Rescue</span></a>
+  <nav aria-label="Guides">
+    <a href="/guides/assess-repair-or-rebuild/" aria-current="page">Assess</a>
+    <a href="/guides/preview-works-production-differs/">Preview vs production</a>
+    <a href="/guides/what-a-passing-build-does-not-prove/">Passing builds</a>
+    <a href="/resources/">Resources</a>
+    <a href="/release-evidence/">Release evidence</a>
+  </nav>
+</header>
+<main id="main">
+  <section class="hero">
+    <p class="eyebrow">Guide · decision aid, not a scan</p>
+    <h1>Assess, Repair, or Rebuild an AI-Built App?</h1>
+    <p class="lead">You have an AI-built or heavily agent-assisted app that mostly runs, but change feels risky, velocity collapsed, or someone is already saying “rewrite it.” You need an evidence gate, not a slogan.</p>
+    <p class="fine">Author: AppRescue. Reviewed 13 September 2026. This page does not inspect your repository and does not certify security, correctness, or production readiness.</p>
+  </section>
+
+  <div class="notice"><strong>Two different next steps.</strong> The worksheet below and the <a href="/release-evidence/">Release Evidence Check</a> are free self-evidence tools. They stay in this browser tab and do not read your code. Requesting an assessment fit check is also free. If accepted, the proposed $499 scoped pilot provides a written structural assessment under agreed source access, scope, and delivery date. Filling this page does not purchase that assessment. There is no checkout here. A fit inquiry is not an accepted order.</div>
+
+  <section id="direct-answer">
+    <h2>Direct answer</h2>
+    <p><strong>Do not lock a rebuild budget on vibes.</strong> Treat “start over” as a trigger, not a conclusion. First separate three questions:</p>
+    <ol>
+      <li><strong>What still works</strong> that you must not casually discard?</li>
+      <li><strong>What breaks when you change it</strong> (changeability), and which risk zones you cannot ignore?</li>
+      <li><strong>What you do not know yet</strong> (evidence gaps)—and whether those gaps make both repair and rewrite estimates fiction?</li>
+    </ol>
+    <p>Until those are written down, the rational gate is usually <strong>Assess first</strong>: understand observed structure, gaps, and next checks. That is not “Repair” as a product promise, and not “Rebuild” as an emotional default.</p>
+    <p>There is no numeric rewrite threshold on this page. One critical unknown—an unproven restore, unclear tenancy, or nobody having reviewed changeability in the actual codebase—can be enough to stay on Assess first. Counting worksheet boxes does not produce a verdict.</p>
+    <p><strong>AppAssessment</strong>, if you use it later, is a <strong>bounded structural diagnostic</strong>: observed structure, evidence gaps, and recommended next checks. It is not a security certification, not a penetration test, not a verified-correctness stamp, not production approval, and not guaranteed or autonomous bug repair.</p>
+  </section>
+
+  <h2>The rewrite urge (and why it feels merciful)</h2>
+  <p>Rewrite talk rarely starts from a calm spreadsheet. It starts from a doom loop: each fix creates two new bugs; agents spin on the same files; “one more feature” feels impossible. In that fog, a clean start sounds like mercy.</p>
+  <p>Sometimes the judgment is engineering. Sometimes it is aesthetic—a new hire or board member reacting to unfamiliar structure, naming density, or AI-generated sprawl, not to measured changeability. Treating aesthetic discomfort as an automatic rewrite mandate is how teams burn quarters rebuilding what already served users.</p>
+  <p><strong>Rule:</strong> Rewrite talk is a trigger event. The decision needs inputs.</p>
+
+  <h2>What rewrites discard (opportunity cost, not a win-rate claim)</h2>
+  <p>Industry discussion often notes that full rewrites can throw away a large working majority of an application. Treat that as market conversation about opportunity cost, not an AppRescue performance claim or a promised salvage rate.</p>
+  <p>What gets discarded is rarely only “ugly code.” It often includes:</p>
+  <ul>
+    <li>Edge-case behavior users already rely on</li>
+    <li>Auth and payment paths that finally stopped failing after painful iteration</li>
+    <li>Tribal knowledge in quirky but production-tested branches</li>
+    <li>Integrations, flags, and runbooks that never make the rewrite backlog</li>
+  </ul>
+  <p>A rewrite also discards time-to-value. While the new system is incomplete, you still operate the old one—or you freeze features. Hybrid and sequenced paths exist as a planning pattern to protect a working core while replacing the parts that truly cannot change. That is not a claim that hybrid approaches usually win, or that AppRescue measured a win rate. If you are comparing the cost of staying versus leaving a builder, pair this with the <a href="/resources/app-cost-calculator/">running-cost calculator</a> and the <a href="/resources/app-portability-checklist/">portability checklist</a>. A zip export is not operable control.</p>
+
+  <h2>Runs is not the same as changeable</h2>
+  <p>“The code does work” is often true—and incomplete.</p>
+  <p>An app can run, accept users, and even take payments while remaining:</p>
+  <ul>
+    <li><strong>Unchangeable</strong> — hub modules every edit touches; fear of edit; agent or human fix–break loops</li>
+    <li><strong>Hard to secure in practice</strong> — unclear trust boundaries, secrets ownership, weak tenancy patterns (this page does not certify security)</li>
+    <li><strong>Unscalable beyond happy paths</strong> — architecture that never existed outside the demo</li>
+  </ul>
+  <p>So the fork is not “Does it boot?” It is: can you change it safely enough to sequence recovery—or is the change surface so collapsed that a rebuild or strangler is the cheaper path to controllable value?</p>
+
+  <h2>Decision inputs (four buckets)</h2>
+  <h3>1. Changeability</h3>
+  <ul>
+    <li>Where do small edits break distant features?</li>
+    <li>Are there god-file hubs every change touches?</li>
+    <li>Do agents or humans loop without progress on the same modules?</li>
+    <li>Is there a module map—or only tribal memory?</li>
+  </ul>
+  <h3>2. Risk flags (education, not a scan)</h3>
+  <ul>
+    <li>Auth, sessions, tenancy</li>
+    <li>Payments / webhooks / billing integrity</li>
+    <li>Secrets ownership and location</li>
+    <li>PII / retention clarity</li>
+    <li>Backup / restore proof</li>
+  </ul>
+  <p>Marking “Unknown” here is progress. It is not a pen-test result.</p>
+  <h3>3. Time-to-value</h3>
+  <ul>
+    <li>How long until users feel improvement under repair, hybrid, or rewrite hypotheses?</li>
+    <li>What must stay live during transition?</li>
+    <li>What is the cost of feature freeze while rebuilding?</li>
+  </ul>
+  <h3>4. Evidence gaps</h3>
+  <p>Write down what you do not know yet: CI reality, test reality, environment and secrets inventory (names only), architecture notes (especially after heavy AI use with few notes), ownership of deploy and restore, critical journey maps.</p>
+  <p><strong>Rule of thumb:</strong> If no one has reviewed changeability and risk in the actual codebase, rewrite is a hypothesis, not a plan.</p>
+
+  <h2>Three paths (plus the honest fourth gate)</h2>
+  <h3>Path A — Sequenced repair (hypothesis)</h3>
+  <p>Keep the system of record. Triage modules into keep / fix / replace. Stabilize critical journeys first. Sequence work so shipping does not require boiling the ocean.</p>
+  <p><strong>Claim lock:</strong> Choosing “Repair” on the worksheet is a planning hypothesis. It is not a promise that AppRescue delivers autonomous repair, auto-heal, or hands-on remediations by default. Any repair work, if offered later, would be separately scoped.</p>
+  <h3>Path B — Hybrid strangler</h3>
+  <p>Leave a working core; extract or rebuild high-pain seams behind clear boundaries. Ship value through the strangler while retiring dangerous modules. That pattern can fit when rewrite urge is strong but revenue still depends on the current app. It is a sequencing option, not a measured “hybrid usually wins” result.</p>
+  <h3>Path C — Rebuild</h3>
+  <p>Justified when evidence shows the change surface is collapsed, risk is unacceptable, and time-to-value favors a new foundation—after you name what must be preserved (data, contracts, journeys). Rebuild without that inventory recreates the same mess with newer names.</p>
+  <h3>Gate D — Assess first / need more evidence</h3>
+  <p>When evidence gaps are large, or when a single critical unknown makes both estimates fiction, the correct output is not Repair or Rebuild. It is stop irreversible spend until structure and gaps are observed.</p>
+
+  <h2>Rebuild advice without looking</h2>
+  <p>A full-rebuild recommendation that comes from a conversation alone, without reviewing the actual system, is incomplete. It may be a guess, a sales motion, or an honest first reaction under time pressure. This page does not treat every rebuild suggestion as upsell, and it does not name competitors. Treat the recommendation as a trigger to gather evidence.</p>
+  <p>Watch for:</p>
+  <ul>
+    <li>Quotes that jump to “full rewrite” from conversation alone</li>
+    <li>Collapse of understanding into immediate rebuild with no decision artifact</li>
+    <li>Guarantees of cheaper or faster outcomes without evidence</li>
+    <li>“Connect the repo and we’ll auto-heal it” style promises (not offered here)</li>
+  </ul>
+  <p>“Mess” is a starting description, not a conclusion.</p>
+
+  <h2>What AppAssessment is and is not</h2>
+  <p><strong>Is</strong> (bounded structural diagnostic, only if a later request is accepted):</p>
+  <ul>
+    <li>Observed structure of what can be seen under agreed scope</li>
+    <li>Explicit evidence gaps</li>
+    <li>Recommended next checks, including pointing at release-evidence style artifacts</li>
+  </ul>
+  <p><strong>Is not:</strong></p>
+  <ul>
+    <li>A security certification or penetration test</li>
+    <li>Verified correctness or production approval</li>
+    <li>Autonomous bug repair, guaranteed repair, or deploy remediations</li>
+    <li>A promise that repair or rebuild will be cheaper or faster</li>
+  </ul>
+  <p>If you still need a human structural read after the free worksheets, that is a <a href="/#beta">fit inquiry</a>—not an accepted order. See also <a href="/resources/editorial-policy/">editorial policy</a>.</p>
+
+  <h2 id="worksheet">Assess / Repair / Rebuild gate worksheet</h2>
+  <p>Purpose: slow “our codebase is a mess—start over” into a fillable gate. Self-reported only. Not a scan, certification, or automated score.</p>
+  <p>How to use: fill the blanks in this tab or print the page. Prefer <strong>Assess first</strong> whenever a critical unknown would make a repair or rebuild estimate fiction. There is no box-count rule.</p>
+  <p class="fine">Reminder: a Repair checkbox is not AppRescue delivery of repair. Do not paste secrets, tokens, or customer data into these fields.</p>
+
+  <h3>1) Context snapshot (self-reported)</h3>
+  <div class="panel">
+    <div class="field"><label for="app-name">App / product name (internal)</label><input id="app-name" type="text" autocomplete="off"></div>
+    <div class="field"><label for="app-age">Approximate age of codebase</label><input id="app-age" type="text" autocomplete="off"></div>
+    <div class="field"><label for="app-stack">Primary stack (if known)</label><input id="app-stack" type="text" autocomplete="off"></div>
+    <div class="field"><label for="app-stage">Users / stage (optional, self-described)</label><input id="app-stage" type="text" autocomplete="off"></div>
+    <p class="lbl">Who is pushing rewrite talk?</p>
+    <div class="choices">
+      <label><input type="checkbox" name="who-founder"> Founder</label>
+      <label><input type="checkbox" name="who-eng"> Eng</label>
+      <label><input type="checkbox" name="who-board"> Board</label>
+      <label><input type="checkbox" name="who-agency"> Agency</label>
+      <label><input type="checkbox" name="who-other"> Other</label>
+    </div>
+    <p class="lbl">Trigger this month</p>
+    <div class="choices">
+      <label><input type="checkbox" name="trig-velocity"> Velocity cliff</label>
+      <label><input type="checkbox" name="trig-doom"> Doom loop</label>
+      <label><input type="checkbox" name="trig-hire"> Hire / inherit</label>
+      <label><input type="checkbox" name="trig-diligence"> Diligence</label>
+      <label><input type="checkbox" name="trig-board"> Board ask</label>
+      <label><input type="checkbox" name="trig-other"> Other</label>
+    </div>
+    <div class="field"><label for="context-notes">Notes</label><textarea id="context-notes"></textarea></div>
+  </div>
+
+  <h3>2) What still works (keep list)</h3>
+  <div class="panel">
+    <div class="field"><label for="keep-1">Keep item 1</label><input id="keep-1" type="text" autocomplete="off"></div>
+    <div class="field"><label for="keep-2">Keep item 2</label><input id="keep-2" type="text" autocomplete="off"></div>
+    <div class="field"><label for="keep-3">Keep item 3</label><input id="keep-3" type="text" autocomplete="off"></div>
+    <div class="field"><label for="keep-4">Keep item 4</label><input id="keep-4" type="text" autocomplete="off"></div>
+    <div class="field"><label for="keep-5">Keep item 5</label><input id="keep-5" type="text" autocomplete="off"></div>
+  </div>
+
+  <h3>3) What breaks on change (changeability signals)</h3>
+  <div class="panel">
+    <p><strong>God file / hub module every edit touches</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="chg-hub" value="y"> Yes</label>
+      <label><input type="radio" name="chg-hub" value="n"> No</label>
+      <label><input type="radio" name="chg-hub" value="u"> Unknown</label>
+    </div>
+    <div class="field"><label for="chg-hub-notes">Notes</label><input id="chg-hub-notes" type="text" autocomplete="off"></div>
+    <p><strong>Fix–break / doom loop on the same area</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="chg-loop" value="y"> Yes</label>
+      <label><input type="radio" name="chg-loop" value="n"> No</label>
+      <label><input type="radio" name="chg-loop" value="u"> Unknown</label>
+    </div>
+    <div class="field"><label for="chg-loop-notes">Notes</label><input id="chg-loop-notes" type="text" autocomplete="off"></div>
+    <p><strong>Fear of edit (“don’t touch that”)</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="chg-fear" value="y"> Yes</label>
+      <label><input type="radio" name="chg-fear" value="n"> No</label>
+      <label><input type="radio" name="chg-fear" value="u"> Unknown</label>
+    </div>
+    <div class="field"><label for="chg-fear-notes">Notes</label><input id="chg-fear-notes" type="text" autocomplete="off"></div>
+    <p><strong>Agent or human loops without progress</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="chg-agent" value="y"> Yes</label>
+      <label><input type="radio" name="chg-agent" value="n"> No</label>
+      <label><input type="radio" name="chg-agent" value="u"> Unknown</label>
+    </div>
+    <div class="field"><label for="chg-agent-notes">Notes</label><input id="chg-agent-notes" type="text" autocomplete="off"></div>
+    <p><strong>Multi-file breakage on small features</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="chg-multi" value="y"> Yes</label>
+      <label><input type="radio" name="chg-multi" value="n"> No</label>
+      <label><input type="radio" name="chg-multi" value="u"> Unknown</label>
+    </div>
+    <div class="field"><label for="chg-multi-notes">Notes</label><input id="chg-multi-notes" type="text" autocomplete="off"></div>
+    <p><strong>No module map / architecture notes</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="chg-map" value="y"> Yes</label>
+      <label><input type="radio" name="chg-map" value="n"> No</label>
+      <label><input type="radio" name="chg-map" value="u"> Unknown</label>
+    </div>
+    <div class="field"><label for="chg-map-notes">Notes</label><input id="chg-map-notes" type="text" autocomplete="off"></div>
+  </div>
+
+  <h3>4) Risk flags (education only)</h3>
+  <div class="panel">
+    <p><strong>Auth / session / tenancy concerns</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="risk-auth" value="ok"> OK</label>
+      <label><input type="radio" name="risk-auth" value="risk"> Risk</label>
+      <label><input type="radio" name="risk-auth" value="u"> Unknown</label>
+    </div>
+    <p><strong>Payments / webhooks / billing integrity</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="risk-pay" value="ok"> OK</label>
+      <label><input type="radio" name="risk-pay" value="risk"> Risk</label>
+      <label><input type="radio" name="risk-pay" value="u"> Unknown</label>
+    </div>
+    <p><strong>Secrets in repo or unclear key ownership</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="risk-secrets" value="ok"> OK</label>
+      <label><input type="radio" name="risk-secrets" value="risk"> Risk</label>
+      <label><input type="radio" name="risk-secrets" value="u"> Unknown</label>
+    </div>
+    <p><strong>PII / data stores / retention unclear</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="risk-pii" value="ok"> OK</label>
+      <label><input type="radio" name="risk-pii" value="risk"> Risk</label>
+      <label><input type="radio" name="risk-pii" value="u"> Unknown</label>
+    </div>
+    <p><strong>Backup / restore unproven</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="risk-restore" value="ok"> OK</label>
+      <label><input type="radio" name="risk-restore" value="risk"> Risk</label>
+      <label><input type="radio" name="risk-restore" value="u"> Unknown</label>
+    </div>
+    <p><strong>Known incidents without write-up</strong></p>
+    <div class="choices">
+      <label><input type="radio" name="risk-incidents" value="ok"> OK</label>
+      <label><input type="radio" name="risk-incidents" value="risk"> Risk</label>
+      <label><input type="radio" name="risk-incidents" value="u"> Unknown</label>
+    </div>
+    <p class="fine">Not a security certification or scan result. Record names of stores and owners, not secret values.</p>
+  </div>
+
+  <h3>5) Time / cost hypotheses (rough, honest—not vendor quotes)</h3>
+  <div class="panel">
+    <p><strong>Rebuild hypothesis</strong></p>
+    <div class="field"><label for="rebuild-time">Calendar time to usable parity</label><input id="rebuild-time" type="text" autocomplete="off"></div>
+    <p class="lbl">Feature freeze risk</p>
+    <div class="choices">
+      <label><input type="radio" name="freeze" value="low"> Low</label>
+      <label><input type="radio" name="freeze" value="med"> Medium</label>
+      <label><input type="radio" name="freeze" value="high"> High</label>
+    </div>
+    <div class="field"><label for="rebuild-live">What must stay live during rebuild</label><input id="rebuild-live" type="text" autocomplete="off"></div>
+    <p><strong>Sequenced repair / hybrid hypothesis</strong></p>
+    <div class="field"><label for="repair-first">First valuable stabilization</label><input id="repair-first" type="text" autocomplete="off"></div>
+    <div class="field"><label for="repair-modules">Modules to fix first</label><input id="repair-modules" type="text" autocomplete="off"></div>
+    <div class="field"><label for="strangler-later">Modules to strangler or replace later</label><input id="strangler-later" type="text" autocomplete="off"></div>
+    <p class="fine">Compare hypotheses only after the evidence-gap section. Unknown evidence can invalidate both. Use your own figures in the <a href="/resources/app-cost-calculator/">cost calculator</a> if money is part of the argument.</p>
+  </div>
+
+  <h3>6) Evidence gaps</h3>
+  <div class="panel">
+    <label class="check"><input type="checkbox" name="gap-ci"> <span>Clean install / CI green not verified against real conditions</span></label>
+    <label class="check"><input type="checkbox" name="gap-tests"> <span>Test reality unknown (what passes is not always what matters)</span></label>
+    <label class="check"><input type="checkbox" name="gap-env"> <span>Environments / secrets inventory incomplete (names only)</span></label>
+    <label class="check"><input type="checkbox" name="gap-arch"> <span>No architecture / comprehension notes</span></label>
+    <label class="check"><input type="checkbox" name="gap-journeys"> <span>Critical journeys not mapped</span></label>
+    <label class="check"><input type="checkbox" name="gap-own"> <span>Ownership of deploy / restore unclear</span></label>
+    <label class="check"><input type="checkbox" name="gap-handoff"> <span>Vendor or agency handoff incomplete (a zip is not operable control)</span></label>
+    <label class="check"><input type="checkbox" name="gap-preview"> <span>Preview vs production behavior unexplained — see <a href="/guides/preview-works-production-differs/">Why preview works but production differs</a></span></label>
+    <label class="check"><input type="checkbox" name="gap-green"> <span>“Green build” treated as proof — see <a href="/guides/what-a-passing-build-does-not-prove/">What a passing build does not prove</a></span></label>
+    <label class="check"><input type="checkbox" name="gap-pack"> <span>Acceptance evidence pack incomplete — use the <a href="/release-evidence/">Release Evidence Check</a></span></label>
+    <div class="field"><label for="gap-other">Other gap</label><input id="gap-other" type="text" autocomplete="off"></div>
+    <p class="fine">A single critical unknown can be enough to choose Assess first. Do not add these boxes and treat the total as a rewrite threshold.</p>
+  </div>
+
+  <h3>7) Stakeholder alignment</h3>
+  <div class="panel">
+    <p>For each group, note whether anyone reviewed changeability in the <strong>actual</strong> codebase. These ratings are conversation prompts, not a score that unlocks rebuild.</p>
+    <p><strong>Founder / CEO</strong> — alignment on problem</p>
+    <div class="choices">
+      <label><input type="radio" name="found-prob" value="1"> 1</label>
+      <label><input type="radio" name="found-prob" value="2"> 2</label>
+      <label><input type="radio" name="found-prob" value="3"> 3</label>
+      <label><input type="radio" name="found-prob" value="4"> 4</label>
+      <label><input type="radio" name="found-prob" value="5"> 5</label>
+    </div>
+    <p>Alignment on path</p>
+    <div class="choices">
+      <label><input type="radio" name="found-path" value="1"> 1</label>
+      <label><input type="radio" name="found-path" value="2"> 2</label>
+      <label><input type="radio" name="found-path" value="3"> 3</label>
+      <label><input type="radio" name="found-path" value="4"> 4</label>
+      <label><input type="radio" name="found-path" value="5"> 5</label>
+    </div>
+    <p><strong>Eng lead / team</strong> — alignment on problem</p>
+    <div class="choices">
+      <label><input type="radio" name="eng-prob" value="1"> 1</label>
+      <label><input type="radio" name="eng-prob" value="2"> 2</label>
+      <label><input type="radio" name="eng-prob" value="3"> 3</label>
+      <label><input type="radio" name="eng-prob" value="4"> 4</label>
+      <label><input type="radio" name="eng-prob" value="5"> 5</label>
+    </div>
+    <p>Alignment on path</p>
+    <div class="choices">
+      <label><input type="radio" name="eng-path" value="1"> 1</label>
+      <label><input type="radio" name="eng-path" value="2"> 2</label>
+      <label><input type="radio" name="eng-path" value="3"> 3</label>
+      <label><input type="radio" name="eng-path" value="4"> 4</label>
+      <label><input type="radio" name="eng-path" value="5"> 5</label>
+    </div>
+    <p><strong>Board / advisors</strong> — alignment on problem</p>
+    <div class="choices">
+      <label><input type="radio" name="board-prob" value="1"> 1</label>
+      <label><input type="radio" name="board-prob" value="2"> 2</label>
+      <label><input type="radio" name="board-prob" value="3"> 3</label>
+      <label><input type="radio" name="board-prob" value="4"> 4</label>
+      <label><input type="radio" name="board-prob" value="5"> 5</label>
+    </div>
+    <p>Alignment on path</p>
+    <div class="choices">
+      <label><input type="radio" name="board-path" value="1"> 1</label>
+      <label><input type="radio" name="board-path" value="2"> 2</label>
+      <label><input type="radio" name="board-path" value="3"> 3</label>
+      <label><input type="radio" name="board-path" value="4"> 4</label>
+      <label><input type="radio" name="board-path" value="5"> 5</label>
+    </div>
+    <div class="field"><label for="align-notes">Notes (who looked at the actual codebase?)</label><textarea id="align-notes"></textarea></div>
+  </div>
+
+  <h3>8) Decision gate (choose one primary)</h3>
+  <div class="panel">
+    <label class="check"><input type="radio" name="gate" value="assess"> <span><strong>Assess first / need more evidence</strong> — structure, risk, or a critical unknown is still open; do not lock irreversible rewrite spend yet</span></label>
+    <label class="check"><input type="radio" name="gate" value="repair"> <span><strong>Repair hypothesis</strong> — sequenced recovery planning; keep the system of record; triage keep/fix/replace (not a promise of AppRescue autonomous repair)</span></label>
+    <label class="check"><input type="radio" name="gate" value="hybrid"> <span><strong>Hybrid strangler</strong> — protect the working core; extract high-pain seams</span></label>
+    <label class="check"><input type="radio" name="gate" value="rebuild"> <span><strong>Rebuild</strong> — only with a keep-list, journey map, and named evidence, not feelings alone</span></label>
+    <div class="field"><label for="gate-rationale">Rationale</label><textarea id="gate-rationale"></textarea></div>
+  </div>
+
+  <h2>Explicit limitations</h2>
+  <ul>
+    <li>This guide and worksheet are educational decision aids. They do not inspect your repo, certify security, verify correctness, approve production readiness, or repair bugs.</li>
+    <li>AppAssessment, if requested later, remains a bounded structural diagnostic: observed structure, evidence gaps, recommended next checks—not a pen-test, certification, production approval, or autonomous repair product.</li>
+    <li>Marking Repair on the worksheet does not mean AppRescue will deliver repair work. Repair, if ever offered, would be separately scoped.</li>
+    <li>Sibling guides, <a href="/resources/">resources</a>, and <a href="/release-evidence/">Release Evidence Check</a> are part of this public-repository cluster. Hosted availability, indexing, traffic, and revenue are not proven by this page.</li>
+    <li>No case studies, testimonials, logos, rankings, or invented salvage metrics appear here because none are claimed.</li>
+  </ul>
+
+  <h2>Next step (fit inquiry)</h2>
+  <p>If the worksheet leaves you with large evidence gaps—or you want a bounded structural read of what is observable and what still needs checking—you can submit a <a href="/#beta">fit inquiry</a>. A request is not an accepted order, not a rewrite quote, and not a repair commitment. AppRescue beta consideration is our own service, not a certification.</p>
+
+  <h2>Related</h2>
+  <ul>
+    <li><a href="/guides/preview-works-production-differs/">Why preview works but production differs</a></li>
+    <li><a href="/guides/what-a-passing-build-does-not-prove/">What a passing build does not prove</a></li>
+    <li><a href="/release-evidence/">Release Evidence Check</a> — do not treat this guide as a competing checklist</li>
+    <li><a href="/resources/app-cost-calculator/">Running-cost calculator</a></li>
+    <li><a href="/resources/app-portability-checklist/">App portability checklist</a></li>
+  </ul>
+
+  <h2>Authorship / methodology</h2>
+  <p>Hand-prepared editorial for AppRescue organic acquisition. Repair-versus-rewrite decision-aid ideas were rewritten for AppRescue claim bounds: AppAssessment is a bounded structural diagnostic only. No invented customers, metrics, testimonials, search-volume figures, or affiliate tracking. Unpaid links only.</p>
+  <p class="fine">Reviewed 13 September 2026. Refresh after a real review of the page or its sources. This is a publication candidate, not proof that the page is hosted or indexed.</p>
+</main>
+<footer>
+  <p><a href="/#beta">AppRescue beta consideration</a> is our own service, not a certification. <a href="/resources/editorial-policy/">Editorial policy</a>.</p>
+</footer>
+</body>
+</html>

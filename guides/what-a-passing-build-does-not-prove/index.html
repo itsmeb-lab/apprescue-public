@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What a Passing Build Does Not Prove — AppRescue</title>
+<meta name="description" content="Green CI feels like safety. This why-page maps common ‘it passed’ claims to what the signal actually showed—and what evidence is still missing.">
+<link rel="canonical" href="https://apprescue.ai/guides/what-a-passing-build-does-not-prove/">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="index,follow">
+<style>
+:root{color-scheme:dark;--bg:#0b1017;--panel:#141d29;--line:#2c394b;--text:#edf3fa;--muted:#b3c2d3;--accent:#78ead7;--warning:#ffd398}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden;overflow-wrap:anywhere}a{color:var(--accent)}a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}header,main,footer{width:min(860px,calc(100% - 32px));margin:auto}header{padding:20px 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:16px;flex-wrap:wrap}header a{text-decoration:none}nav{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}.brand{font-weight:800;font-size:20px;color:var(--text)}.brand span{color:var(--accent)}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:750}.hero{padding:40px 0 12px}h1{font-size:clamp(28px,6vw,46px);line-height:1.15;letter-spacing:-.03em;margin:12px 0 16px}h2{font-size:22px;margin:28px 0 10px}h3{font-size:18px;margin:20px 0 8px}p,li{margin:0 0 12px}ul,ol{padding-left:22px}.lead,.fine{color:var(--muted)}.fine{font-size:13px}.notice{padding:14px 18px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;color:var(--muted);margin:18px 0}.cite{font-size:13px;color:var(--muted)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:12px 0;min-width:0}.map h3{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}.map p{margin:0 0 12px}.skip{position:absolute;left:8px;top:-60px;background:var(--text);color:var(--bg);padding:12px;z-index:10}.skip:focus{top:8px}footer{padding:28px 0;color:var(--muted);font-size:13px}@media(max-width:720px){header{align-items:flex-start}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+  <a class="brand" href="https://apprescue.ai/">App<span>Rescue</span></a>
+  <nav aria-label="Guides">
+    <a href="/guides/assess-repair-or-rebuild/">Assess</a>
+    <a href="/guides/preview-works-production-differs/">Preview vs production</a>
+    <a href="/guides/what-a-passing-build-does-not-prove/" aria-current="page">Passing builds</a>
+    <a href="/resources/">Resources</a>
+    <a href="/release-evidence/">Release evidence</a>
+  </nav>
+</header>
+<main id="main">
+  <section class="hero">
+    <p class="eyebrow">Why-page · mapping table, not a second checklist</p>
+    <h1>What a Passing Build Does Not Prove</h1>
+    <p class="lead">The pipeline is green. Generated tests passed. Someone says “we’re good to ship / accept.” You need to know what that signal actually showed—and what it did not.</p>
+    <p class="fine">Author: AppRescue. Reviewed 13 September 2026. Status-check claims are anchored to GitHub Docs. This page does not publish a second acceptance checklist.</p>
+  </section>
+
+  <div class="notice"><strong>A reported green status only proves what the configured and executed status or check actually established.</strong> It does not prove that every intended check ran. Use the mapping table, then record missing non-sensitive evidence in the <a href="/release-evidence/">Release Evidence Check</a>.</div>
+
+  <section id="direct-answer">
+    <h2>Direct answer</h2>
+    <p><strong>A reported green status only proves what the configured and executed status or check actually established for that commit—not that production is correct, secure, or operable, and not that every intended check ran.</strong> On some systems a skipped job can still report success.</p>
+    <p>Status checks on GitHub “show whether commits meet the conditions set for a repository” (builds, tests, scanning hooks, deployment checks, and similar). They help reviewers decide if a pull request is ready to merge under <strong>repo-defined</strong> rules. They are not a substitute for observed production evidence. Source: <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks" rel="noopener noreferrer">GitHub Docs — About status checks</a>.</p>
+    <p>Also material: <strong>a skipped job can report Success</strong> and may not block merge even when marked required. Same GitHub Docs page: “A job that is skipped will report its status as ‘Success’. It will not prevent a pull request from merging, even if it is a required check.”</p>
+    <p>So: a pipeline color is not production proof, and a green mark is not evidence that skipped, unconfigured, or unexecuted work ran. Use the mapping table below, then collect missing evidence with the <a href="/release-evidence/">Release Evidence Check</a>. This page intentionally does not publish a second acceptance checklist.</p>
+  </section>
+
+  <h2>Why green CI feels like safety</h2>
+  <p>Status checks are visible, binary, and socially calming. In AI-built apps the comfort can be stronger: agents generate tests, the workflow stays green, and “it compiled” gets confused with “it was observed under real auth, real data, and real release ownership.”</p>
+  <p>That confusion is expensive at acceptance time. Buyers hear “passed.” Sellers mean “pipeline conditions were met.” Neither statement alone answers: Can the critical workflow be shown? Who owns the accounts? Where are the secrets? What restores when something fails?</p>
+
+  <h2>What builds and status checks often do show</h2>
+  <p>Depending on what you configured and what actually executed, a successful check may show things like:</p>
+  <ul>
+    <li>The commit’s configured build or package step completed</li>
+    <li>Configured unit or integration jobs reported success</li>
+    <li>A lint or typecheck job completed</li>
+    <li>A deployment-check integration reported a state for that commit</li>
+  </ul>
+  <p>Per GitHub, checks and commit statuses are mechanisms for reporting whether <strong>repository conditions</strong> were met—not a universal certificate of production readiness. See <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks" rel="noopener noreferrer">About status checks</a>.</p>
+
+  <h2>What they often do not prove</h2>
+  <p>Without claiming a vulnerability catalog or promising a pen-test, these gaps are common:</p>
+  <ul>
+    <li><strong>Authorization / tenancy</strong> — tests that never assert “user A cannot see user B”</li>
+    <li><strong>Production configuration</strong> — Preview-scoped secrets, different callbacks, frozen <code>NEXT_PUBLIC_*</code> values (see <a href="/guides/preview-works-production-differs/">Why preview works but production differs</a>)</li>
+    <li><strong>Payments and webhook edge paths</strong> — happy-path mocks are not live processor behavior</li>
+    <li><strong>Restore / release ownership</strong> — a green build is not a proven backup restore or known account ownership</li>
+    <li><strong>Skipped work disguised as success</strong> — skipped jobs reporting Success (<a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks" rel="noopener noreferrer">GitHub Docs</a>)</li>
+    <li><strong>Generated tests that mirror the bug</strong> — coverage of the wrong behavior stays green</li>
+  </ul>
+  <p>This is an explainer, not a scanning product.</p>
+
+  <h2 id="mapping">“Green build ≠ proven” mapping table</h2>
+  <article class="panel map">
+    <h3>Claim people hear</h3>
+    <p>“CI passed—we’re safe to accept.”</p>
+    <h3>What the signal actually showed</h3>
+    <p>Configured status checks for the commit reported success under repo conditions (<a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks" rel="noopener noreferrer">GitHub Docs</a>).</p>
+    <h3>Evidence still missing</h3>
+    <p>Observed critical workflows under the <strong>target</strong> environment; explicit known unknowns.</p>
+    <h3>Next check</h3>
+    <p>Record non-sensitive labels and status in the <a href="/release-evidence/">Release Evidence Check</a>.</p>
+  </article>
+  <article class="panel map">
+    <h3>Claim people hear</h3>
+    <p>“All required checks are green.”</p>
+    <h3>What the signal actually showed</h3>
+    <p>Required checks reported success—including possible <strong>skipped</strong> jobs that still show Success (<a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks" rel="noopener noreferrer">GitHub Docs</a>).</p>
+    <h3>Evidence still missing</h3>
+    <p>Which jobs actually ran versus skipped; whether skipped jobs cover authorization, data, or restore.</p>
+    <h3>Next check</h3>
+    <p>Inspect check details for what executed. Then use the <a href="/release-evidence/">Release Evidence Check</a> for acceptance artifacts.</p>
+  </article>
+  <article class="panel map">
+    <h3>Claim people hear</h3>
+    <p>“Tests passed.”</p>
+    <h3>What the signal actually showed</h3>
+    <p>The test jobs you configured exited successfully—if those jobs actually ran.</p>
+    <h3>Evidence still missing</h3>
+    <p>Whether tests assert authorization, isolation, and failure modes that matter in production.</p>
+    <h3>Next check</h3>
+    <p>Map journeys to evidence fields on the <a href="/release-evidence/">Release Evidence Check</a>.</p>
+  </article>
+  <article class="panel map">
+    <h3>Claim people hear</h3>
+    <p>“Build succeeded.”</p>
+    <h3>What the signal actually showed</h3>
+    <p>A compile, package, or pipeline step completed for that commit.</p>
+    <h3>Evidence still missing</h3>
+    <p>Runtime config parity; production host, auth, and data behavior.</p>
+    <h3>Next check</h3>
+    <p>Diff preview versus production with <a href="/guides/preview-works-production-differs/">Why preview works but production differs</a>. Record outcomes as non-sensitive labels in the <a href="/release-evidence/">Release Evidence Check</a>.</p>
+  </article>
+  <article class="panel map">
+    <h3>Claim people hear</h3>
+    <p>“Deploy check is green.”</p>
+    <h3>What the signal actually showed</h3>
+    <p>A deployment-related check reported a status for the commit.</p>
+    <h3>Evidence still missing</h3>
+    <p>Who owns GitHub and hosting; secrets location; last proven restore; production domain behavior.</p>
+    <h3>Next check</h3>
+    <p>Ownership, restore, and workflow proof on the <a href="/release-evidence/">Release Evidence Check</a>.</p>
+  </article>
+  <article class="panel map">
+    <h3>Claim people hear</h3>
+    <p>“Generated tests cover it.”</p>
+    <h3>What the signal actually showed</h3>
+    <p>Generated suites executed without failure under their harness—when that job was configured and executed.</p>
+    <h3>Evidence still missing</h3>
+    <p>Independent observation of workflows; gaps the generator never modeled.</p>
+    <h3>Next check</h3>
+    <p>Treat as a partial signal. Capture unknowns on the <a href="/release-evidence/">Release Evidence Check</a>.</p>
+  </article>
+  <article class="panel map">
+    <h3>Claim people hear</h3>
+    <p>“Ship it—pipeline is happy.”</p>
+    <h3>What the signal actually showed</h3>
+    <p>Merge or ship gates based on repo status checks were satisfied for the checks that ran.</p>
+    <h3>Evidence still missing</h3>
+    <p>Production approval is a business and operations decision needing observed evidence—not a CI color.</p>
+    <h3>Next check</h3>
+    <p>Do not invent a second checklist here. Use the <a href="/release-evidence/">Release Evidence Check</a>.</p>
+  </article>
+  <article class="panel map">
+    <h3>Claim people hear</h3>
+    <p>“If it were broken, CI would fail.”</p>
+    <h3>What the signal actually showed</h3>
+    <p>Only failures your executed jobs know how to detect.</p>
+    <h3>Evidence still missing</h3>
+    <p>Entire classes of production-only and configuration-only failures, plus any skipped required jobs that still reported Success.</p>
+    <h3>Next check</h3>
+    <p>Assess-first if structure is opaque: <a href="/guides/assess-repair-or-rebuild/">Assess, repair, or rebuild</a>. Evidence pack: <a href="/release-evidence/">Release Evidence Check</a>.</p>
+  </article>
+  <p class="fine">Next checks point to the existing Release Evidence utility. This why-page does not define a competing checklist schema, cost page, or portability page. Cost questions still belong on the <a href="/resources/app-cost-calculator/">running-cost calculator</a> when money is the argument.</p>
+
+  <h2>Where AppAssessment fits (and stops)</h2>
+  <p>If status-check comfort collapses into “we still cannot see structure, ownership, or gaps,” a <strong>bounded structural diagnostic</strong> can help: observed structure, explicit evidence gaps, recommended next checks.</p>
+  <p><strong>AppAssessment is not</strong> automated, a security certification, a penetration test, a verified-correctness stamp, production approval, guaranteed repair, or autonomous bug repair. It does not replace the <a href="/release-evidence/">Release Evidence Check</a>.</p>
+
+  <h2>Explicit limitations</h2>
+  <ul>
+    <li>This page is a why-page plus mapping table. It is not a release-evidence checklist, not a pen-test, not a certification, and not production approval.</li>
+    <li>Citations to GitHub Docs describe how status checks behave in general; they are not a review of your repository’s workflows.</li>
+    <li>AppAssessment remains a bounded structural diagnostic only (observed structure, evidence gaps, recommended next checks).</li>
+    <li>These pages are publication candidates in this public repository. Hosted availability, indexing, traffic, and revenue are not proven here.</li>
+    <li>No fake case studies, testimonials, rankings, invented “escape rate” metrics, or affiliate links.</li>
+  </ul>
+
+  <h2>Next step (fit inquiry)</h2>
+  <p>If the mapping table leaves large gaps—and you want a bounded structural read of what is observable versus what still needs checking—submit a <a href="/#beta">fit inquiry</a>. That request is not an accepted order, rewrite quote, or repair commitment. AppRescue beta consideration is our own service.</p>
+
+  <h2>Related</h2>
+  <ul>
+    <li><a href="/release-evidence/">Release Evidence Check</a> — canonical acceptance utility (use this; do not fork a second checklist from this page)</li>
+    <li><a href="/guides/preview-works-production-differs/">Why preview works but production differs</a></li>
+    <li><a href="/guides/assess-repair-or-rebuild/">Assess, repair, or rebuild</a></li>
+  </ul>
+
+  <h2>Primary source</h2>
+  <ul>
+    <li><a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks" rel="noopener noreferrer">https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks</a> (status checks show whether commits meet repository conditions; skipped jobs can report Success; checks assist merge readiness under repo rules—not production proof by themselves)</li>
+  </ul>
+
+  <h2>Authorship / methodology</h2>
+  <p>Hand-prepared editorial why-page for AppRescue organic acquisition. The decision aid is the mapping table only—no second release-evidence checklist. Status-check behavior claims are anchored to unpaid GitHub Docs. AppAssessment language is locked to a bounded structural diagnostic. No invented customers, metrics, or testimonials.</p>
+  <p class="fine">Reviewed 13 September 2026. This is a publication candidate, not proof that the page is hosted or indexed. <a href="/resources/editorial-policy/">Editorial policy</a>.</p>
+</main>
+<footer>
+  <p><a href="/#beta">AppRescue beta consideration</a> is our own service, not a certification.</p>
+</footer>
+</body>
+</html>

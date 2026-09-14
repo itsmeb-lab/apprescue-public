@@ -84,8 +84,8 @@ test('assess page uses a qualitative evidence gate, not a numeric rewrite thresh
   assert.match(html.assess, /requesting an assessment fit check is also free/i);
   assert.doesNotMatch(html.assess, /optional paid fit inquiry/i);
   assert.doesNotMatch(html.assess, /not automated|not an automated product/i);
-  assert.match(html.assess, /proposed scoped pilot price of \$499/);
-  assert.match(html.assess, /written scope, access method, and delivery date/);
+  assert.match(html.assess, /proposed \$499 scoped pilot/);
+  assert.match(html.assess, /agreed source access, scope, and delivery date/);
   assert.doesNotMatch(html.assess, /often wins/i);
   assert.doesNotMatch(html.assess, /necessarily (upsell|guessing)|is guessing or upselling/i);
   assert.match(html.assess, /does not treat every rebuild suggestion as upsell/i);

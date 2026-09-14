@@ -81,7 +81,9 @@ test('assess page uses a qualitative evidence gate, not a numeric rewrite thresh
   assert.match(html.assess, /one critical unknown/i);
   assert.match(opening(html.assess), /no numeric rewrite threshold/i);
   assert.match(html.assess, /free self-evidence/i);
-  assert.match(html.assess, /optional paid fit inquiry/i);
+  assert.match(html.assess, /requesting an assessment fit check is also free/i);
+  assert.doesNotMatch(html.assess, /optional paid fit inquiry/i);
+  assert.doesNotMatch(html.assess, /not automated|not an automated product/i);
   assert.match(html.assess, /proposed scoped pilot price of \$499/);
   assert.match(html.assess, /written scope, access method, and delivery date/);
   assert.doesNotMatch(html.assess, /often wins/i);
